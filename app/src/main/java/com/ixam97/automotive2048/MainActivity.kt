@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
             var aspectRatio by remember { mutableFloatStateOf(1f) }
 
-            Automotive2048Theme ( uniqueTheme = Build.BRAND ) {
+            Automotive2048Theme ( uniqueTheme = if (viewModel.oemSchemeEnabled) Build.BRAND else "" ) {
                 Box(modifier = Modifier.fillMaxSize().onSizeChanged { size ->
                     aspectRatio = size.width.toFloat() / size.height.toFloat()
                 }) {

@@ -20,12 +20,13 @@
     <string name="dialog_won_continue">Continue playing</string>
 
     <string name="settings_title">Settings</string>
-    <string name="undo_enable_title">Enable undo Button</string>
+    <string name="undo_enable_title">Enable undo button</string>
+    <string name="use_oem_theme_title">Use OEM color scheme</string>
 
     <string name="about_title">About 2048 Automotive</string>
     <string name="version_headline">Version</string>
     <string name="copyright_headline">Copyright</string>
-    <string name="inspired_headline">Inspired by the clasic "2048" by Gabriele Cirulli</string>
+    <string name="inspired_headline">Inspired by the classic "2048" by Gabriele Cirulli</string>
     <string name="inspired_text">Visit his GitHub-Repository to learn more about the original.</string>
     <string name="inspired_url" translatable="false">https://github.com/gabrielecirulli/2048</string>
     <string name="github_headline">GitHub</string>

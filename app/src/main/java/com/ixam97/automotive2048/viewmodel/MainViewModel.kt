@@ -24,6 +24,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var undoButtonEnabled by mutableStateOf(gameRepository.getAllowUndo())
         private set
+    var oemSchemeEnabled by mutableStateOf(gameRepository.getOemSchemeEnabled())
+        private set
 
     var currentScreenIndex by mutableIntStateOf(0)
         private set
@@ -91,11 +93,21 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         Log.w(TAG, "Test Function")
     }
 
+    private fun saveSettings() {
+        gameRepository.saveSettings(
+            allowUndo = undoButtonEnabled,
+            oemSchemeEnabled = oemSchemeEnabled
+        )
+    }
+
     fun toggleUndoButtonSetting() {
         undoButtonEnabled = !undoButtonEnabled
-        gameRepository.saveSettings(
-            allowUndo = undoButtonEnabled
-        )
+        saveSettings()
+    }
+
+    fun toggleOemSchemeSetting() {
+        oemSchemeEnabled = !oemSchemeEnabled
+        saveSettings()
     }
 
     fun restartGame() {

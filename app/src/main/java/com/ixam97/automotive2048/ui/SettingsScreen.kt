@@ -2,6 +2,7 @@ package com.ixam97.automotive2048.ui
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,6 +32,7 @@ import com.ixam97.automotive2048.ui.components.MenuRow
 import com.ixam97.automotive2048.ui.theme.iconButtonSize
 import com.ixam97.automotive2048.viewmodel.MainViewModel
 import com.ixam97.automotive2048.BuildConfig
+import com.ixam97.automotive2048.repository.GameRepository
 import com.ixam97.automotive2048.ui.components.SwitchRow
 
 @Composable
@@ -90,6 +92,14 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 switchState = viewModel.undoButtonEnabled
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+            if (GameRepository.supportedOEMsList.contains(Build.BRAND)) {
+                SwitchRow(
+                    title = stringResource(R.string.use_oem_theme_title),
+                    onClick = { viewModel.toggleOemSchemeSetting() },
+                    switchState = viewModel.oemSchemeEnabled
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+            }
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
