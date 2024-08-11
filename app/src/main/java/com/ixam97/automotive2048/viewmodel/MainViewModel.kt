@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.ixam97.automotive2048.domain.GameState
@@ -30,6 +31,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var gameWinDismissed by mutableStateOf(false)
         private set
     var gameLost by mutableStateOf(false)
+        private set
+    var showRestartDialog by mutableStateOf(false)
         private set
 
     init {
@@ -114,5 +117,13 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     fun dismissWin() {
         gameWinDismissed = true
+    }
+
+    fun closeRestartDialog() {
+        showRestartDialog = false
+    }
+
+    fun showRestartDialog() {
+        showRestartDialog = true
     }
 }

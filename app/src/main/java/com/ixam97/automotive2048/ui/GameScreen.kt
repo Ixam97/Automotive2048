@@ -28,8 +28,6 @@ import com.ixam97.automotive2048.viewmodel.MainViewModel
 fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
     Scaffold  { innerPadding ->
 
-        var showRestartDialog by remember { mutableStateOf(false) }
-
         Box (
             modifier = Modifier
                 .padding(innerPadding)
@@ -59,7 +57,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         score = viewModel.gameState.score,
                         highscore = viewModel.highscore,
                         onSettingsClick = { viewModel.settingsClicked() },
-                        onRestartClick = { viewModel.restartGame() },
+                        onRestartClick = { viewModel.showRestartDialog() },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
                         historySize = viewModel.historySize()
@@ -76,7 +74,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         score = viewModel.gameState.score,
                         highscore = viewModel.highscore,
                         onSettingsClick = { viewModel.settingsClicked() },
-                        onRestartClick = { showRestartDialog = true },
+                        onRestartClick = { viewModel.showRestartDialog() },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
                         historySize = viewModel.historySize()
@@ -108,12 +106,12 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                 }
             }
 
-            if (showRestartDialog) {
+            if (viewModel.showRestartDialog) {
                 GameDialog(
                     titleText = "Restart Game?",
                     dialogButtons = listOf(
-                        DialogButton("Restart", { viewModel.restartGame(); showRestartDialog = false }, active = true),
-                        DialogButton( "Cancel", { showRestartDialog = false })
+                        DialogButton("Restart", { viewModel.restartGame(); viewModel.closeRestartDialog() }, active = true),
+                        DialogButton( "Cancel", { viewModel.closeRestartDialog() })
                     )
                 ) { }
             }

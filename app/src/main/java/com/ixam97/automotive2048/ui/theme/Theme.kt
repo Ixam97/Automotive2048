@@ -10,19 +10,19 @@ val iconButtonSize = 60.dp
 
 private val defaultColorScheme = darkColorScheme(
     background = Color.Black,
-    surface = clubNight,
+    surface = clubNightVariant,
     onBackground = Color.White,
     onSurface = Color.White,
     primary = clubBlue,
     onPrimary = Color.White,
-    surfaceVariant = clubNightVariant
+    surfaceContainer = clubNight
 
 )
 
 private val polestarColorScheme = defaultColorScheme.copy(
     primary = polestarOrange,
     surface = polestarSurface,
-    surfaceVariant = headerBackground
+    surfaceContainer = polestarDarkSurface
 )
 
 @Composable

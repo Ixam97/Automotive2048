@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,7 +45,8 @@ fun GameDialog(
     ) {
         Column (
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .widthIn(max = 800.dp)
         ) {
             Column (
                 modifier = Modifier
@@ -63,7 +65,7 @@ fun GameDialog(
             }
             Row {
                 dialogButtons.forEachIndexed { index, button ->
-                    if (index > 0) Spacer(Modifier.size(3.dp))
+                    if (index > 0) Spacer(Modifier.size(5.dp))
                     Box (
                         modifier = Modifier
                             .weight(1f)
@@ -71,7 +73,7 @@ fun GameDialog(
                                 if (button.active) {
                                     MaterialTheme.colorScheme.primary
                                 } else {
-                                    MaterialTheme.colorScheme.surfaceVariant
+                                    MaterialTheme.colorScheme.surface
                                 }
                             )
                             .clickable(onClick =  button.onClick)

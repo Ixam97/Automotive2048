@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val polestarOrange = Color(0xFFD96C00)
 val polestarSurface = Color(0xff1f1f1f)// Color(0xff090909)
+val polestarDarkSurface = Color(0xFF0F0F0F)
 val volvoBlue = Color(0xFF2F6093)
 
 val disabledTextColor = Color(0xFF757575)
