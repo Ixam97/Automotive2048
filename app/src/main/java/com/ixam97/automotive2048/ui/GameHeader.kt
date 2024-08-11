@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Menu
@@ -48,7 +48,8 @@ fun GameHeader(
 ) {
     if (aspectRatio > 1) {
         Column (
-            modifier = Modifier.width(IntrinsicSize.Min)
+            modifier = Modifier
+                .widthIn(max = 400.dp)
         ) {
             TitleCard()
             HorizontalDivider(

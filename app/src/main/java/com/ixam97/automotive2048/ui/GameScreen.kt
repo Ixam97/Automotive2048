@@ -2,15 +2,13 @@ package com.ixam97.automotive2048.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,17 +34,12 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
             if (aspectRatio > 1f) {
                 Row (
                     modifier = Modifier
-                        .width(IntrinsicSize.Min)
+                        // .width(IntrinsicSize.Max)
+                        .wrapContentWidth()
                         .padding(25.dp)
                 ) {
                     GameGrid(
-                        modifier = Modifier
-                            .weight(1f)
-                            .sizeIn(
-                                maxHeight = 800.dp,
-                                maxWidth = 800.dp
-                            ),
-                        gridDimensions = Pair(4, 4),
+                        gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
                         gameState = viewModel.gameState
                     )
@@ -81,13 +74,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                     )
                     Spacer(Modifier.size(20.dp))
                     GameGrid(
-                        modifier = Modifier
-                            .weight(1f)
-                            .sizeIn(
-                                maxHeight = 1000.dp,
-                                maxWidth = 1000.dp
-                            ),
-                        gridDimensions = Pair(4, 4),
+                        gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
                         gameState = viewModel.gameState
                     )

@@ -37,7 +37,7 @@ class GameRepository(context: Context) {
     }
 
     fun getAllowUndo(): Boolean = sharedPrefs.getBoolean(KEY_ALLOW_UNDO, true)
-    fun getOemSchemeEnabled(): Boolean = sharedPrefs.getBoolean(KEY_OEM_SCHEME, true)
+    fun getOemSchemeEnabled(): Boolean = sharedPrefs.getBoolean(KEY_OEM_SCHEME, false)
     fun getHighScore(): Int = sharedPrefs.getInt(KEY_HIGHSCORE, 0)
     fun getWinDismissed(): Boolean = sharedPrefs.getBoolean(KEY_WIN_DISMISSED, false)
 
