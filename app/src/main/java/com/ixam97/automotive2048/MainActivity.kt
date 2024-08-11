@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ixam97.automotive2048.repository.GameRepository
 import com.ixam97.automotive2048.ui.GameScreen
+import com.ixam97.automotive2048.ui.LicensesScreen
 import com.ixam97.automotive2048.ui.SettingsScreen
 import com.ixam97.automotive2048.ui.theme.Automotive2048Theme
 import com.ixam97.automotive2048.viewmodel.MainViewModel
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
                     val aspectRatio = maxWidth / maxHeight
                     when (viewModel.currentScreenIndex) {
                         1 -> SettingsScreen(viewModel)
+                        2 -> LicensesScreen(viewModel)
                         else -> GameScreen(viewModel, aspectRatio)
                     }
                 }

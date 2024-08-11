@@ -24,15 +24,19 @@ val Typography = Typography(
         fontSize = 48.sp
     ),
     titleLarge = TextStyle(
-        fontSize = 120.sp
+        fontSize = 38.sp
     ),
     titleMedium = TextStyle(
-        fontSize = 60.sp
+        fontSize = 31.sp
     ),
     titleSmall = TextStyle(
         fontSize = 30.sp
     ),
-    bodyLarge = TextStyle(fontSize = 31.sp)
+    bodyLarge = TextStyle(fontSize = 31.sp),
+    bodyMedium = TextStyle(fontSize = 31.sp),
+    bodySmall = TextStyle(fontSize = 25.sp),
+    labelSmall = TextStyle(fontSize = 25.sp),
+    labelLarge = TextStyle(fontSize = 31.sp)
 )
 
 val defaultPolestarTypography = Typography(

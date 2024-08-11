@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ixam97.automotive2048.R
 import com.ixam97.automotive2048.ui.theme.disabledTextColor
 import com.ixam97.automotive2048.ui.theme.iconButtonSize
@@ -119,7 +120,7 @@ private fun TitleCard() {
     Column {
         Text(
             text = "2048",
-            style = MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge.copy(fontSize = 120.sp)
         )
         Text(
             text = stringResource(R.string.gametype_endless),
@@ -138,7 +139,7 @@ private fun ScoreCard(modifier: Modifier = Modifier, name: String, value: Int) {
             .padding(vertical = 15.dp, horizontal = 30.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
-        val defaultTextStyle = MaterialTheme.typography.titleMedium
+        val defaultTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 60.sp)
         var textStyle by remember { mutableStateOf(defaultTextStyle) }
         Text(
             modifier = Modifier

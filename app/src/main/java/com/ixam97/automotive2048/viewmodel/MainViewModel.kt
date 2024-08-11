@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.repository.GameRepository
 
@@ -38,19 +37,19 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var showRestartDialog by mutableStateOf(false)
         private set
 
-    init {
-    }
-
     fun historySize() = gameStateHistory.size
 
     fun settingsClicked() {
-        Log.i(TAG, "Open Settings")
         currentScreenIndex = 1
     }
-
+    fun licensesClicked() {
+        currentScreenIndex = 2
+    }
     fun settingsBackClicked() {
-        Log.i(TAG, "Close Settings")
         currentScreenIndex = 0
+    }
+    fun licensesBackClicked() {
+        currentScreenIndex = 1
     }
 
     fun swiped(dir: SwipeDirection) {
@@ -89,9 +88,11 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         // canUndo = gameStateHistory.size > 0
     }
 
+    /*
     fun testFunction() {
         Log.w(TAG, "Test Function")
     }
+    */
 
     private fun saveSettings() {
         gameRepository.saveSettings(

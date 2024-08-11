@@ -151,7 +151,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
             MenuRow(
                 title = stringResource(R.string.licenses_headline),
                 browsable = true,
-                onClick = {}
+                onClick = { viewModel.licensesClicked() }
             )
         }
     }
