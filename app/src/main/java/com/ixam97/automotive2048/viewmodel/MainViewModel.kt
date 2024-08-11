@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.ixam97.automotive2048.Automotive2048
 import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.repository.GameRepository

@@ -1,5 +1,6 @@
 package com.ixam97.automotive2048
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -7,6 +8,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
@@ -43,6 +45,7 @@ import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.domain.Tile
 import com.ixam97.automotive2048.ui.theme.getCellColor
 import com.ixam97.automotive2048.ui.theme.polestarOrange
+import com.ixam97.automotive2048.utils.length
 import kotlin.math.absoluteValue
 
 @Composable
@@ -59,7 +62,7 @@ fun GameGrid(
     var currentPosition by remember { mutableStateOf(Offset(0f, 0f)) }
     var flinged by remember { mutableStateOf(false) }
 
-    // var boxSize by remember { mutableStateOf(0.dp) }
+    var boxSize by remember { mutableStateOf(0.dp) }
 
     val density = LocalDensity.current
 
@@ -215,15 +218,21 @@ private fun GridTiles(gameState: GameState, dimensions: Int) {
                             .aspectRatio(1f)
                     ) {
                         val value = gameState.getTileValue(column, row)
-                        if (value != 0) {
-                            Box(
+                        if (value != 0 && value != null) {
+                            BoxWithConstraints (
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .offset()
                                     .background(getCellColor(value)),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = value.toString())
+                                val fontSize = ((maxWidth.value / 2.5) * 3/value.length().coerceAtLeast(3)).sp
+                                Log.d("BOX", "Font Size: $fontSize")
+                                Text(
+                                    text = value.toString(),
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = fontSize
+                                )
                             }
                         }
                     }
