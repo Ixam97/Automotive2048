@@ -15,13 +15,14 @@ private val defaultColorScheme = darkColorScheme(
     onSurface = Color.White,
     primary = clubBlue,
     onPrimary = Color.White,
-    surfaceContainer = Color.Green
+    surfaceVariant = clubNightVariant
 
 )
 
 private val polestarColorScheme = defaultColorScheme.copy(
     primary = polestarOrange,
     surface = polestarSurface,
+    surfaceVariant = headerBackground
 )
 
 @Composable

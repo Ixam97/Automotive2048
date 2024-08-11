@@ -95,6 +95,9 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         Log.i(TAG, "Game restart requested")
         gameState = gameState.initNewGame(4)
         gameStateHistory.clear()
+        gameLost = false
+        gameWon = false
+        gameWinDismissed = false
         gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
         canUndo = gameStateHistory.size > 0
     }
@@ -103,8 +106,13 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         if (gameStateHistory.size > 0) {
             gameState = gameStateHistory.last()
             gameStateHistory.removeAt(gameStateHistory.lastIndex)
+            gameLost = false
         }
         gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
         canUndo = gameStateHistory.size > 0
+    }
+
+    fun dismissWin() {
+        gameWinDismissed = true
     }
 }

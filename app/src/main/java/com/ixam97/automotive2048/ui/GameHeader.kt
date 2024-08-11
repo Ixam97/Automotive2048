@@ -40,7 +40,7 @@ fun GameHeader(
     score: Int,
     highscore: Int,
     onSettingsClick: () -> Unit,
-    onResetClick: () -> Unit,
+    onRestartClick: () -> Unit,
     onUndoClick: () -> Unit,
     historySize: Int,
     aspectRatio: Float
@@ -58,7 +58,7 @@ fun GameHeader(
             ButtonRow (
                 modifier = Modifier.fillMaxWidth(),
                 onSettingsClick = onSettingsClick,
-                onResetClick = onResetClick,
+                onResetClick = onRestartClick,
                 onUndoClick = onUndoClick,
                 historySize = historySize
             )
@@ -93,7 +93,7 @@ fun GameHeader(
                 ButtonRow(
                     modifier = Modifier.fillMaxWidth(),
                     onSettingsClick = onSettingsClick,
-                    onResetClick = onResetClick,
+                    onResetClick = onRestartClick,
                     onUndoClick = onUndoClick,
                     historySize = historySize
                 )

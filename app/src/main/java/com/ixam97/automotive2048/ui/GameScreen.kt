@@ -12,7 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -22,6 +27,9 @@ import com.ixam97.automotive2048.viewmodel.MainViewModel
 @Composable
 fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
     Scaffold  { innerPadding ->
+
+        var showRestartDialog by remember { mutableStateOf(false) }
+
         Box (
             modifier = Modifier
                 .padding(innerPadding)
@@ -51,7 +59,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         score = viewModel.gameState.score,
                         highscore = viewModel.highscore,
                         onSettingsClick = { viewModel.settingsClicked() },
-                        onResetClick = { viewModel.restartGame() },
+                        onRestartClick = { viewModel.restartGame() },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
                         historySize = viewModel.historySize()
@@ -68,7 +76,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         score = viewModel.gameState.score,
                         highscore = viewModel.highscore,
                         onSettingsClick = { viewModel.settingsClicked() },
-                        onResetClick = { viewModel.restartGame() },
+                        onRestartClick = { showRestartDialog = true },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
                         historySize = viewModel.historySize()
@@ -85,6 +93,39 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         onSwipe = {dir -> viewModel.swiped(dir)},
                         gameState = viewModel.gameState
                     )
+                }
+            }
+
+            if (viewModel.gameWon && !viewModel.gameWinDismissed) {
+                GameDialog(
+                    titleText = "GAME WON!",
+                    dialogButtons = listOf(
+                        DialogButton("Continue", { viewModel.dismissWin() }, active = true),
+                        DialogButton("Restart Game", { viewModel.restartGame() })
+                    )
+                ) {
+                    Text("You have created a tile with the value 2048 and won the game! You can now continue to play this session or start a new game.")
+                }
+            }
+
+            if (showRestartDialog) {
+                GameDialog(
+                    titleText = "Restart Game?",
+                    dialogButtons = listOf(
+                        DialogButton("Restart", { viewModel.restartGame(); showRestartDialog = false }, active = true),
+                        DialogButton( "Cancel", { showRestartDialog = false })
+                    )
+                ) { }
+            }
+            if (viewModel.gameLost) {
+                GameDialog(
+                    titleText = "GAME LOST!",
+                    dialogButtons = listOf(
+                        DialogButton("Restart", { viewModel.restartGame() }),
+                        DialogButton("Undo Move", { viewModel.undoMove() })
+                    )
+                ) {
+                    Text("You can either undo your last moves, or reset the game and start from the beginning!")
                 }
             }
 
