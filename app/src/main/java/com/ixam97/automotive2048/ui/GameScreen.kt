@@ -106,7 +106,7 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                 GameDialog(
                     titleText = stringResource(R.string.dialog_lost_title),
                     dialogButtons = listOf(
-                        DialogButton(stringResource(R.string.dialog_lost_restart), { viewModel.restartGame() }),
+                        DialogButton(stringResource(R.string.dialog_lost_restart), { viewModel.restartGame() }, active = true),
                         DialogButton(stringResource(R.string.dialog_lost_undo), { viewModel.undoMove() })
                     )
                 ) {

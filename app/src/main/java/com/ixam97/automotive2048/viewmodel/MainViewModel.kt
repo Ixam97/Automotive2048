@@ -77,7 +77,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
         }
 
-        if (gameState.checkWinCondition()) {
+        if (gameState.checkWinCondition() && !gameWinDismissed) {
             Log.e("GAME CONDITION", "GAME WON!")
             gameWon = true
         } else if (gameState.checkLostCondition()) {
