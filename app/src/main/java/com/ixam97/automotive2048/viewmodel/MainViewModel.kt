@@ -45,17 +45,30 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     fun swiped(dir: SwipeDirection) {
         Log.i(TAG, "Swiped: ${dir.name}")
-        gameStateHistory.add(gameState)
-        if(gameStateHistory.size > 5) {
-            gameStateHistory.removeAt(0)
-        }
+
         gameState.makeMove(dir).let {
-            gameState = it.gameState
-            if (gameState.score > highscore) {
-                highscore = gameState.score
+            if (it.validMove) {
+                gameStateHistory.add(gameState)
+                if(gameStateHistory.size > 5) {
+                    gameStateHistory.removeAt(0)
+                }
+                gameState = it.gameState
+                if (gameState.score > highscore) {
+                    highscore = gameState.score
+                }
+                gameRepository.save(gameState, highscore)
+            } else {
+                Log.i("GAME CONDITION", "INVALID MOVE")
             }
-            gameRepository.save(gameState, highscore)
+
         }
+
+        if (gameState.checkWinCondition()) {
+            Log.e("GAME CONDITION", "GAME WON!")
+        } else if (gameState.checkLostCondition()) {
+            Log.e("GAME CONDITION", "GAME LOST!")
+        }
+
         canUndo = gameStateHistory.size > 0
     }
 

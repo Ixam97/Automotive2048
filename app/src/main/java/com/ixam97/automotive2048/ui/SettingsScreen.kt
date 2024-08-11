@@ -83,20 +83,11 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
         }
     ) { innerPadding ->
-        var switchState by remember { mutableStateOf(false) }
         Column (
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .background(
-                    brush = Brush.horizontalGradient(listOf(
-                        cell2Color,
-                        cell16Color,
-                        cell128Color,
-                        cell1024Color
-                    ))
-                ),
         ) {
 
             /*

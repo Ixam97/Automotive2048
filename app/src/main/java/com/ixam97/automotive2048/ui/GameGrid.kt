@@ -1,6 +1,7 @@
 package com.ixam97.automotive2048
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -218,16 +219,16 @@ private fun GridTiles(gameState: GameState, dimensions: Int) {
                             .aspectRatio(1f)
                     ) {
                         val value = gameState.getTileValue(column, row)
+                        val offset = animateDpAsState(0.dp)
                         if (value != 0 && value != null) {
                             BoxWithConstraints (
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .offset()
+                                    .offset(x = offset.value)
                                     .background(getCellColor(value)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 val fontSize = ((maxWidth.value / 2.5) * 3/value.length().coerceAtLeast(3)).sp
-                                Log.d("BOX", "Font Size: $fontSize")
                                 Text(
                                     text = value.toString(),
                                     fontWeight = FontWeight.Medium,
