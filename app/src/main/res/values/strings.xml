@@ -32,5 +32,5 @@
     <string name="github_headline">GitHub</string>
     <string name="github_text">Visit my GitHub-Repository to learn more about the app, see the source code and report issues or suggestions.</string>
     <string name="github_url" translatable="false">https://github.com/Ixam97/Automotive2048</string>
-    <string name="licenses_headline">Licenses</string>
+    <string name="licenses_headline">Third party licenses</string>
 </resources>
