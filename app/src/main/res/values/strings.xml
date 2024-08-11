@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name" translatable="false">2048 Automotive</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="score">Score</string>
+    <string name="highscore">Highscore</string>
+    <string name="gametype_endless">Endless Game</string>
+</resources>
