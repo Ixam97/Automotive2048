@@ -1,6 +1,7 @@
 package com.ixam97.automotive2048.ui
 
-import androidx.compose.foundation.background
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,22 +19,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchColors
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ixam97.automotive2048.R
@@ -42,10 +32,6 @@ import com.ixam97.automotive2048.ui.theme.iconButtonSize
 import com.ixam97.automotive2048.viewmodel.MainViewModel
 import com.ixam97.automotive2048.BuildConfig
 import com.ixam97.automotive2048.ui.components.SwitchRow
-import com.ixam97.automotive2048.ui.theme.cell1024Color
-import com.ixam97.automotive2048.ui.theme.cell128Color
-import com.ixam97.automotive2048.ui.theme.cell16Color
-import com.ixam97.automotive2048.ui.theme.cell2Color
 
 @Composable
 fun SettingsScreen(viewModel: MainViewModel) {
@@ -89,16 +75,17 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
+            val context = LocalContext.current
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .padding(top = 24.dp, bottom = 10.dp),
                 color = MaterialTheme.colorScheme.primary,
-                text = "Settings"
+                text = stringResource(R.string.settings_title)
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             SwitchRow(
-                title = "Enable undo button",
+                title = stringResource(R.string.undo_enable_title),
                 onClick = {viewModel.toggleUndoButtonSetting()},
                 switchState = viewModel.undoButtonEnabled
             )
@@ -108,28 +95,51 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     .padding(horizontal = 24.dp)
                     .padding(top = 24.dp, bottom = 10.dp),
                 color = MaterialTheme.colorScheme.primary,
-                text = "About 2048 Automotive"
+                text = stringResource(R.string.about_title)
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             MenuRow(
-                title = "Version",
+                title = stringResource(R.string.version_headline),
                 text = BuildConfig.VERSION_NAME
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             MenuRow(
-                title = "Copyright",
+                title = stringResource(R.string.copyright_headline),
                 text = "©2024 Maximilian Goldschmidt"
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             MenuRow(
-                title = "GitHub",
+                title = stringResource(R.string.github_headline),
+                text = stringResource(R.string.github_text),
                 external = true,
                 browsable = true,
-                onClick = {}
+                onClick = {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(context.getString(R.string.github_url))
+                        )
+                    )
+                }
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             MenuRow(
-                title = "Licenses",
+                title = stringResource(R.string.inspired_headline),
+                text = stringResource(R.string.inspired_text),
+                external = true,
+                browsable = true,
+                onClick = {
+                    context.startActivity(
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse(context.getString(R.string.inspired_url))
+                        )
+                    )
+                }
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+            MenuRow(
+                title = stringResource(R.string.licenses_headline),
                 browsable = true,
                 onClick = {}
             )

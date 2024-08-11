@@ -1,7 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_title">Einstellungen</string>
     <string name="score">Punkte</string>
     <string name="highscore">Höchstpunktzahl</string>
     <string name="gametype_endless">Endlosspiel</string>
+
+    <string name="dialog_reset_title">Spiel neu starten?</string>
+    <string name="dialog_reset_confirm">Neustart</string>
+    <string name="dialog_reset_cancel">Abbrechen</string>
+
+    <string name="dialog_lost_title">Spiel verloren!</string>
+    <string name="dialog_lost_text">You can either undo your last moves, or reset the game and start from the beginning!</string>
+    <string name="dialog_lost_restart">Spielneustart</string>
+    <string name="dialog_lost_undo">Rückgängig</string>
+
+    <string name="dialog_won_title">Spiel gewonnen!</string>
+    <string name="dialog_won_text">You have created a tile with the value 2048 and won the game! You can now continue to play this session or start a new game.</string>
+    <string name="dialog_won_restart">Spielneustart</string>
+    <string name="dialog_won_continue">Weiterspielen</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="undo_enable_title">Rückgängig-Schalfläche aktivieren</string>
+
+    <string name="about_title">Über 2048 Automotive</string>
+    <string name="version_headline">Version</string>
+    <string name="copyright_headline">Copyright</string>
+    <string name="inspired_headline">Inspiriert vom Klassiker "2048" von Gabriele Cirulli</string>
+    <string name="inspired_text">Besuche sein GitHub-Repository um mehr über das Original zu erfahren.</string>
+    <string name="github_headline">GitHub</string>
+    <string name="github_text">Besuche mein GitHub-Repository um mehr über die App zu erfahren, den Quellcode einzusehen und Fehler oder Vorschläge mitzuteilen.</string>
+    <string name="licenses_headline">Lizenzen</string>
 </resources>

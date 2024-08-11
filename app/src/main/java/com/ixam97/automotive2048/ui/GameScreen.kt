@@ -14,14 +14,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ixam97.automotive2048.GameGrid
+import com.ixam97.automotive2048.R
 import com.ixam97.automotive2048.viewmodel.MainViewModel
 
 @Composable
@@ -98,34 +96,34 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
 
             if (viewModel.gameWon && !viewModel.gameWinDismissed) {
                 GameDialog(
-                    titleText = "GAME WON!",
+                    titleText = stringResource(R.string.dialog_won_title),
                     dialogButtons = listOf(
-                        DialogButton("Continue", { viewModel.dismissWin() }, active = true),
-                        DialogButton("Restart Game", { viewModel.restartGame() })
+                        DialogButton(stringResource(R.string.dialog_won_continue), { viewModel.dismissWin() }, active = true),
+                        DialogButton(stringResource(R.string.dialog_won_restart), { viewModel.restartGame() })
                     )
                 ) {
-                    Text("You have created a tile with the value 2048 and won the game! You can now continue to play this session or start a new game.")
+                    Text(stringResource(R.string.dialog_won_text))
                 }
             }
 
             if (viewModel.showRestartDialog) {
                 GameDialog(
-                    titleText = "Restart Game?",
+                    titleText = stringResource(R.string.dialog_reset_title),
                     dialogButtons = listOf(
-                        DialogButton("Restart", { viewModel.restartGame(); viewModel.closeRestartDialog() }, active = true),
-                        DialogButton( "Cancel", { viewModel.closeRestartDialog() })
+                        DialogButton(stringResource(R.string.dialog_reset_confirm), { viewModel.restartGame(); viewModel.closeRestartDialog() }, active = true),
+                        DialogButton(stringResource(R.string.dialog_reset_cancel), { viewModel.closeRestartDialog() })
                     )
                 ) { }
             }
             if (viewModel.gameLost) {
                 GameDialog(
-                    titleText = "GAME LOST!",
+                    titleText = stringResource(R.string.dialog_lost_title),
                     dialogButtons = listOf(
-                        DialogButton("Restart", { viewModel.restartGame() }),
-                        DialogButton("Undo Move", { viewModel.undoMove() })
+                        DialogButton(stringResource(R.string.dialog_lost_restart), { viewModel.restartGame() }),
+                        DialogButton(stringResource(R.string.dialog_lost_undo), { viewModel.undoMove() })
                     )
                 ) {
-                    Text("You can either undo your last moves, or reset the game and start from the beginning!")
+                    Text(stringResource(R.string.dialog_lost_text))
                 }
             }
 

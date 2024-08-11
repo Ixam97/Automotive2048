@@ -15,6 +15,12 @@ private const val KEY_ALLOW_UNDO = "key_allow_undo"
 
 class GameRepository(context: Context) {
 
+    companion object {
+        val supportedOEMsList = listOf(
+            "Polestar"
+        )
+    }
+
     private val sharedPrefs = context.getSharedPreferences(KEY_SHARED_PREFS, Context.MODE_PRIVATE)
 
     fun getSavedGameState(): GameState {
