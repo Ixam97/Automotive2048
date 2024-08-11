@@ -25,10 +25,18 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var canUndo by mutableStateOf(false)
         private set
+    var gameWon by mutableStateOf(false)
+        private set
+    var gameWinDismissed by mutableStateOf(false)
+        private set
+    var gameLost by mutableStateOf(false)
+        private set
 
     init {
         gameState = gameRepository.getSavedGameState()
         highscore = gameRepository.getHighScore()
+        gameStateHistory.addAll(gameRepository.getGameHistory())
+        gameWinDismissed = gameRepository.getWinDismissed()
     }
 
     fun historySize() = gameStateHistory.size
@@ -56,7 +64,12 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 if (gameState.score > highscore) {
                     highscore = gameState.score
                 }
-                gameRepository.save(gameState, highscore)
+                gameRepository.save(
+                    gameState = gameState,
+                    highscore =  highscore,
+                    winDismissed = gameWinDismissed,
+                    gameHistory = gameStateHistory
+                )
             } else {
                 Log.i("GAME CONDITION", "INVALID MOVE")
             }
@@ -65,8 +78,10 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
         if (gameState.checkWinCondition()) {
             Log.e("GAME CONDITION", "GAME WON!")
+            gameWon = true
         } else if (gameState.checkLostCondition()) {
             Log.e("GAME CONDITION", "GAME LOST!")
+            gameLost = true
         }
 
         canUndo = gameStateHistory.size > 0
@@ -80,7 +95,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         Log.i(TAG, "Game restart requested")
         gameState = gameState.initNewGame(4)
         gameStateHistory.clear()
-        gameRepository.save(gameState)
+        gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
         canUndo = gameStateHistory.size > 0
     }
 
@@ -89,7 +104,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
             gameState = gameStateHistory.last()
             gameStateHistory.removeAt(gameStateHistory.lastIndex)
         }
-        gameRepository.save(gameState)
+        gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
         canUndo = gameStateHistory.size > 0
     }
 }
