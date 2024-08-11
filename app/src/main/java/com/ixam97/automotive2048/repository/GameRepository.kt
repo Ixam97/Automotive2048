@@ -10,6 +10,7 @@ private const val KEY_HIGHSCORE = "key_highscore"
 private const val KEY_GAME_STATE = "key_game_state"
 private const val KEY_GAME_HISTORY = "key_game_history"
 private const val KEY_WIN_DISMISSED = "key_win_dismissed"
+private const val KEY_ALLOW_UNDO = "key_allow_undo"
 
 
 class GameRepository(context: Context) {
@@ -36,7 +37,19 @@ class GameRepository(context: Context) {
         return gson.fromJson(gameHistoryString, object: TypeToken<List<GameState>>() {}.type)
     }
 
-    fun save(
+    fun getAllowUndo(): Boolean {
+        return sharedPrefs.getBoolean(KEY_ALLOW_UNDO, true)
+    }
+
+    fun saveSettings(
+        allowUndo: Boolean
+    ) {
+        sharedPrefs.edit()
+            .putBoolean(KEY_ALLOW_UNDO, allowUndo)
+            .apply()
+    }
+
+    fun saveGame(
         gameState: GameState,
         gameHistory: List<GameState>,
         winDismissed: Boolean,

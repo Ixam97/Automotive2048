@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.domain.SwipeDirection
@@ -14,21 +14,22 @@ import com.ixam97.automotive2048.repository.GameRepository
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private val TAG = "MainViewModel"
 
-    private val gameStateHistory = mutableListOf<GameState>()
+    private val gameStateHistory = gameRepository.getGameHistory().toMutableStateList()
 
-    // var score by mutableIntStateOf(0)
-        // private set
-    var highscore by mutableIntStateOf(0)
+    var highscore by mutableIntStateOf(gameRepository.getHighScore())
         private set
+    var gameState by mutableStateOf(gameRepository.getSavedGameState())
+        private set
+    var gameWinDismissed by mutableStateOf(gameRepository.getWinDismissed())
+        private set
+    var undoButtonEnabled by mutableStateOf(gameRepository.getAllowUndo())
+        private set
+
     var currentScreenIndex by mutableIntStateOf(0)
         private set
-    var gameState by mutableStateOf(GameState(4))
-        private set
-    var canUndo by mutableStateOf(false)
-        private set
+    // var canUndo by mutableStateOf(false)
+    //    private set
     var gameWon by mutableStateOf(false)
-        private set
-    var gameWinDismissed by mutableStateOf(false)
         private set
     var gameLost by mutableStateOf(false)
         private set
@@ -36,10 +37,6 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
 
     init {
-        gameState = gameRepository.getSavedGameState()
-        highscore = gameRepository.getHighScore()
-        gameStateHistory.addAll(gameRepository.getGameHistory())
-        gameWinDismissed = gameRepository.getWinDismissed()
     }
 
     fun historySize() = gameStateHistory.size
@@ -67,7 +64,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 if (gameState.score > highscore) {
                     highscore = gameState.score
                 }
-                gameRepository.save(
+                gameRepository.saveGame(
                     gameState = gameState,
                     highscore =  highscore,
                     winDismissed = gameWinDismissed,
@@ -87,11 +84,18 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
             gameLost = true
         }
 
-        canUndo = gameStateHistory.size > 0
+        // canUndo = gameStateHistory.size > 0
     }
 
     fun testFunction() {
         Log.w(TAG, "Test Function")
+    }
+
+    fun toggleUndoButtonSetting() {
+        undoButtonEnabled = !undoButtonEnabled
+        gameRepository.saveSettings(
+            allowUndo = undoButtonEnabled
+        )
     }
 
     fun restartGame() {
@@ -101,8 +105,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         gameLost = false
         gameWon = false
         gameWinDismissed = false
-        gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
-        canUndo = gameStateHistory.size > 0
+        gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
+        // canUndo = gameStateHistory.size > 0
     }
 
     fun undoMove() {
@@ -111,8 +115,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
             gameStateHistory.removeAt(gameStateHistory.lastIndex)
             gameLost = false
         }
-        gameRepository.save(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
-        canUndo = gameStateHistory.size > 0
+        gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
+        // canUndo = gameStateHistory.size > 0
     }
 
     fun dismissWin() {

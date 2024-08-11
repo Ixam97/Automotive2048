@@ -43,7 +43,8 @@ fun GameHeader(
     onRestartClick: () -> Unit,
     onUndoClick: () -> Unit,
     historySize: Int,
-    aspectRatio: Float
+    aspectRatio: Float,
+    allowUndo: Boolean
 ) {
     if (aspectRatio > 1) {
         Column (
@@ -60,7 +61,8 @@ fun GameHeader(
                 onSettingsClick = onSettingsClick,
                 onResetClick = onRestartClick,
                 onUndoClick = onUndoClick,
-                historySize = historySize
+                historySize = historySize,
+                allowUndo = allowUndo
             )
             Spacer(Modifier.size(20.dp))
             ScoreCard(
@@ -95,7 +97,8 @@ fun GameHeader(
                     onSettingsClick = onSettingsClick,
                     onResetClick = onRestartClick,
                     onUndoClick = onUndoClick,
-                    historySize = historySize
+                    historySize = historySize,
+                    allowUndo = allowUndo
                 )
                 Spacer(Modifier.size(20.dp))
                 Row (
@@ -158,27 +161,30 @@ private fun ButtonRow(
     onSettingsClick: () -> Unit,
     onResetClick: () -> Unit,
     onUndoClick: () -> Unit,
-    historySize: Int
+    historySize: Int,
+    allowUndo: Boolean
 ) {
     Row (
         modifier = modifier,
         horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(historySize.toString(), color = MaterialTheme.colorScheme.primary)
-        Spacer(Modifier.size(10.dp))
-        IconButton(
-            modifier = Modifier.size(iconButtonSize),
-            onClick = onUndoClick,
-            enabled = historySize > 0
-        ) {
-            Icon(
+        if (allowUndo) {
+            Text(historySize.toString(), color = MaterialTheme.colorScheme.primary)
+            Spacer(Modifier.size(10.dp))
+            IconButton(
                 modifier = Modifier.size(iconButtonSize),
-                imageVector = Icons.AutoMirrored.Filled.Undo,
-                contentDescription = null
-            )
+                onClick = onUndoClick,
+                enabled = historySize > 0
+            ) {
+                Icon(
+                    modifier = Modifier.size(iconButtonSize),
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
+                    contentDescription = null
+                )
+            }
+            Spacer(Modifier.size(20.dp))
         }
-        Spacer(Modifier.size(20.dp))
         IconButton(
             modifier = Modifier.size(iconButtonSize),
             onClick = onResetClick

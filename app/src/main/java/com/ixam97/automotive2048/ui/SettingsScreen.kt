@@ -89,8 +89,6 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
         ) {
-
-            /*
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
@@ -100,12 +98,11 @@ fun SettingsScreen(viewModel: MainViewModel) {
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
             SwitchRow(
-                title = "Test Switch",
-                onClick = { switchState = !switchState},
-                switchState = switchState
+                title = "Enable undo button",
+                onClick = {viewModel.toggleUndoButtonSetting()},
+                switchState = viewModel.undoButtonEnabled
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-             */
             Text(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)

@@ -60,7 +60,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         onRestartClick = { viewModel.showRestartDialog() },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
-                        historySize = viewModel.historySize()
+                        historySize = viewModel.historySize(),
+                        allowUndo = viewModel.undoButtonEnabled
                     )
                 }
             } else {
@@ -77,7 +78,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         onRestartClick = { viewModel.showRestartDialog() },
                         onUndoClick = { viewModel.undoMove() },
                         aspectRatio = aspectRatio,
-                        historySize = viewModel.historySize()
+                        historySize = viewModel.historySize(),
+                        allowUndo = viewModel.undoButtonEnabled
                     )
                     Spacer(Modifier.size(20.dp))
                     GameGrid(
