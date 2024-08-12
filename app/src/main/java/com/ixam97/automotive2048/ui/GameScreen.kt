@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.ixam97.automotive2048.GameGrid
+import com.ixam97.automotive2048.ui.GameGrid
 import com.ixam97.automotive2048.R
 import com.ixam97.automotive2048.viewmodel.MainViewModel
 
@@ -41,7 +41,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                     GameGrid(
                         gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
-                        gameState = viewModel.gameState
+                        gameState = viewModel.gameState,
+                        tileMovements = viewModel.tileMovements
                     )
                     Spacer(Modifier.size(20.dp))
                     GameHeader(
@@ -76,7 +77,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                     GameGrid(
                         gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
-                        gameState = viewModel.gameState
+                        gameState = viewModel.gameState,
+                        tileMovements = viewModel.tileMovements
                     )
                 }
             }

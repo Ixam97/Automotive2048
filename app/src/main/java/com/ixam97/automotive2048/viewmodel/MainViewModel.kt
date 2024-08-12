@@ -7,13 +7,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ixam97.automotive2048.domain.SwipeDirection
+import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.repository.GameRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private val TAG = "MainViewModel"
 
     private val gameStateHistory = gameRepository.getGameHistory().toMutableStateList()
+
+    private var blockSwiping = false
 
     var highscore by mutableIntStateOf(gameRepository.getHighScore())
         private set
@@ -37,6 +43,9 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var showRestartDialog by mutableStateOf(false)
         private set
 
+    var tileMovements by mutableStateOf(TileMovements.noopMovements(gameState.dimensions))
+        private set
+
     fun historySize() = gameStateHistory.size
 
     fun settingsClicked() {
@@ -53,36 +62,47 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
 
     fun swiped(dir: SwipeDirection) {
+        if (blockSwiping) return
         Log.i(TAG, "Swiped: ${dir.name}")
 
         gameState.makeMove(dir).let {
             if (it.validMove) {
-                gameStateHistory.add(gameState)
-                if(gameStateHistory.size > 5) {
-                    gameStateHistory.removeAt(0)
+                blockSwiping = true
+                tileMovements = it.tileMovements
+                // use a coroutine to delay game logic during animation
+                viewModelScope.launch {
+                    delay(90)
+
+                    gameStateHistory.add(gameState)
+                    if(gameStateHistory.size > 5) {
+                        gameStateHistory.removeAt(0)
+                    }
+
+                    gameState = it.gameState
+                    if (gameState.score > highscore) {
+                        highscore = gameState.score
+                    }
+                    gameRepository.saveGame(
+                        gameState = gameState,
+                        highscore =  highscore,
+                        winDismissed = gameWinDismissed,
+                        gameHistory = gameStateHistory
+                    )
+
+                    if (gameState.checkWinCondition() && !gameWinDismissed) {
+                        Log.e("GAME CONDITION", "GAME WON!")
+                        gameWon = true
+                    } else if (gameState.checkLostCondition()) {
+                        Log.e("GAME CONDITION", "GAME LOST!")
+                        gameLost = true
+                    }
+                    blockSwiping = false
+                    tileMovements = TileMovements.noopMovements(gameState.dimensions)
                 }
-                gameState = it.gameState
-                if (gameState.score > highscore) {
-                    highscore = gameState.score
-                }
-                gameRepository.saveGame(
-                    gameState = gameState,
-                    highscore =  highscore,
-                    winDismissed = gameWinDismissed,
-                    gameHistory = gameStateHistory
-                )
             } else {
                 Log.i("GAME CONDITION", "INVALID MOVE")
             }
 
-        }
-
-        if (gameState.checkWinCondition() && !gameWinDismissed) {
-            Log.e("GAME CONDITION", "GAME WON!")
-            gameWon = true
-        } else if (gameState.checkLostCondition()) {
-            Log.e("GAME CONDITION", "GAME LOST!")
-            gameLost = true
         }
 
         // canUndo = gameStateHistory.size > 0

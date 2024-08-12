@@ -1,6 +1,7 @@
-package com.ixam97.automotive2048
+package com.ixam97.automotive2048.ui
 
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.domain.SwipeDirection
+import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.ui.theme.getCellColor
 import com.ixam97.automotive2048.utils.length
 import kotlin.math.absoluteValue
@@ -39,7 +41,8 @@ import kotlin.math.absoluteValue
 fun GameGrid(
     gridDimensions: Int,
     onSwipe: (SwipeDirection) -> Unit,
-    gameState: GameState
+    gameState: GameState,
+    tileMovements: TileMovements
 ) {
     var startPosition by remember { mutableStateOf(Offset(0f, 0f)) }
     var currentPosition by remember { mutableStateOf(Offset(0f, 0f)) }
@@ -87,7 +90,7 @@ fun GameGrid(
             // verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             GridBackground(gridDimensions)
-            GridTiles(gameState, gridDimensions)
+            GridTiles(gameState, gridDimensions, tileMovements)
         }
     }
 }
@@ -144,7 +147,11 @@ private fun GridBackground(dimensions: Int) {
 }
 
 @Composable
-private fun GridTiles(gameState: GameState, dimensions: Int) {
+private fun GridTiles(
+    gameState: GameState,
+    dimensions: Int,
+    tileMovements: TileMovements
+) {
     Column (
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -156,19 +163,35 @@ private fun GridTiles(gameState: GameState, dimensions: Int) {
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 for (column in 0 until dimensions) {
-                    Box(
+                    BoxWithConstraints(
                         modifier = Modifier
                             .weight(1f)
                             .background(Color.Transparent)
                             .aspectRatio(1f)
                     ) {
                         val value = gameState.getTileValue(column, row)
-                        val offset = animateDpAsState(0.dp)
                         if (value != 0 && value != null) {
+                            val xOffset = animateDpAsState(
+                                when (tileMovements.dir) {
+                                    SwipeDirection.LEFT -> { (-(maxWidth + 20.dp)) * tileMovements.movements[row][column] }
+                                    SwipeDirection.RIGHT -> { (maxWidth + 20.dp) * tileMovements.movements[row][column] }
+                                    else -> 0.dp
+                                },
+                                tween(if (tileMovements.dir != SwipeDirection.NOOP) 100 else 0)
+                            )
+
+                            val yOffset = animateDpAsState(
+                                when (tileMovements.dir) {
+                                    SwipeDirection.UP -> { (-(maxHeight + 20.dp)) * tileMovements.movements[row][column] }
+                                    SwipeDirection.DOWN -> { (maxHeight + 20.dp) * tileMovements.movements[row][column] }
+                                    else -> 0.dp
+                                },
+                                tween(if (tileMovements.dir != SwipeDirection.NOOP) 100 else 0)
+                            )
                             BoxWithConstraints (
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .offset(x = offset.value)
+                                    .offset(x = xOffset.value, y = yOffset.value)
                                     .background(getCellColor(value)),
                                 contentAlignment = Alignment.Center
                             ) {

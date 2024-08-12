@@ -1,5 +1,5 @@
 package com.ixam97.automotive2048.domain
 
 enum class SwipeDirection {
-    UP, DOWN, LEFT, RIGHT
+    UP, DOWN, LEFT, RIGHT, NOOP
 }
