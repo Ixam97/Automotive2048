@@ -85,37 +85,36 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
                 gameGridState.applyMovements(tileMovements)
 
+                gameStateHistory.add(gameState)
+                if(gameStateHistory.size > 5) {
+                    gameStateHistory.removeAt(0)
+                }
+
+                gameState = newGameState
+                if (gameState.score > highscore) {
+                    highscore = gameState.score
+                }
+                gameRepository.saveGame(
+                    gameState = gameState,
+                    highscore =  highscore,
+                    winDismissed = gameWinDismissed,
+                    gameHistory = gameStateHistory
+                )
+
+                if (gameState.checkWinCondition() && !gameWinDismissed) {
+                    Log.e("GAME CONDITION", "GAME WON!")
+                    gameWon = true
+                } else if (gameState.checkLostCondition()) {
+                    Log.e("GAME CONDITION", "GAME LOST!")
+                    gameLost = true
+                }
+                gameGridState.updateGameState(gameState, gameStateUpdate.newTile)
+                tileMovements = TileMovements.noopMovements(gameState.dimensions)
+
                 // use a coroutine to delay game logic during animation
                 viewModelScope.launch {
-                    delay(100)
-
-                    gameStateHistory.add(gameState)
-                    if(gameStateHistory.size > 5) {
-                        gameStateHistory.removeAt(0)
-                    }
-
-                    gameState = newGameState
-                    if (gameState.score > highscore) {
-                        highscore = gameState.score
-                    }
-                    gameRepository.saveGame(
-                        gameState = gameState,
-                        highscore =  highscore,
-                        winDismissed = gameWinDismissed,
-                        gameHistory = gameStateHistory
-                    )
-
-                    if (gameState.checkWinCondition() && !gameWinDismissed) {
-                        Log.e("GAME CONDITION", "GAME WON!")
-                        gameWon = true
-                    } else if (gameState.checkLostCondition()) {
-                        Log.e("GAME CONDITION", "GAME LOST!")
-                        gameLost = true
-                    }
-                    gameGridState.updateGameState(gameState, gameStateUpdate.newTile)
-                    blockSwiping = false
-                    tileMovements = TileMovements.noopMovements(gameState.dimensions)
                     delay(150)
+                    blockSwiping = false
                     gameGridState.updateVisibility()
                 }
             } else {
