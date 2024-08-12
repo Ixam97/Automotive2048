@@ -10,4 +10,12 @@ data class TileMovements(
             Array(size) { IntArray(size) {0} }
         )
     }
+
+    inline fun forEachTile(action: (movement: Int, row: Int, col: Int) -> Unit) {
+        movements.forEachIndexed { row, rows ->
+            rows.forEachIndexed { col , movement ->
+                action(movement, row, col)
+            }
+        }
+    }
 }

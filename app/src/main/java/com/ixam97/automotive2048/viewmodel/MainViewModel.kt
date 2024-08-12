@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.repository.GameRepository
+import com.ixam97.automotive2048.domain.GameGridState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -19,7 +20,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     private val gameStateHistory = gameRepository.getGameHistory().toMutableStateList()
 
-    private var blockSwiping = false
+    private var blockSwiping = true
 
     var highscore by mutableIntStateOf(gameRepository.getHighScore())
         private set
@@ -46,6 +47,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var tileMovements by mutableStateOf(TileMovements.noopMovements(gameState.dimensions))
         private set
 
+    var gameGridState by mutableStateOf(GameGridState(gameState))
+
     fun historySize() = gameStateHistory.size
 
     fun settingsClicked() {
@@ -61,24 +64,37 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         currentScreenIndex = 1
     }
 
+    init {
+        viewModelScope.launch {
+            gameGridState.resetGameState(gameState)
+            delay(100)
+            gameGridState.enableAnimations()
+            blockSwiping = false
+        }
+    }
+
     fun swiped(dir: SwipeDirection) {
         if (blockSwiping) return
         Log.i(TAG, "Swiped: ${dir.name}")
 
-        gameState.makeMove(dir).let {
-            if (it.validMove) {
+        gameState.makeMove(dir).let { gameStateUpdate ->
+            if (gameStateUpdate.validMove) {
                 blockSwiping = true
-                tileMovements = it.tileMovements
+                tileMovements = gameStateUpdate.tileMovements
+                val newGameState = gameStateUpdate.gameState
+
+                gameGridState.applyMovements(tileMovements)
+
                 // use a coroutine to delay game logic during animation
                 viewModelScope.launch {
-                    delay(90)
+                    delay(100)
 
                     gameStateHistory.add(gameState)
                     if(gameStateHistory.size > 5) {
                         gameStateHistory.removeAt(0)
                     }
 
-                    gameState = it.gameState
+                    gameState = newGameState
                     if (gameState.score > highscore) {
                         highscore = gameState.score
                     }
@@ -96,8 +112,11 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                         Log.e("GAME CONDITION", "GAME LOST!")
                         gameLost = true
                     }
+                    gameGridState.updateGameState(gameState, gameStateUpdate.newTile)
                     blockSwiping = false
                     tileMovements = TileMovements.noopMovements(gameState.dimensions)
+                    delay(100)
+                    gameGridState.updateVisibility()
                 }
             } else {
                 Log.i("GAME CONDITION", "INVALID MOVE")
@@ -133,23 +152,44 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     fun restartGame() {
         Log.i(TAG, "Game restart requested")
-        gameState = gameState.initNewGame(4)
-        gameStateHistory.clear()
-        gameLost = false
-        gameWon = false
-        gameWinDismissed = false
-        gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
+        blockSwiping = true
+        viewModelScope.launch {
+            gameState = gameState.initNewGame(4)
+            gameStateHistory.clear()
+            gameLost = false
+            gameWon = false
+            gameWinDismissed = false
+            gameGridState.resetGameState(gameState)
+            gameGridState.updateVisibility()
+            gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
+
+            delay(100)
+            gameGridState.enableAnimations()
+            blockSwiping = false
+        }
         // canUndo = gameStateHistory.size > 0
     }
 
     fun undoMove() {
-        if (gameStateHistory.size > 0) {
-            gameState = gameStateHistory.last()
-            gameStateHistory.removeAt(gameStateHistory.lastIndex)
-            gameLost = false
-        }
-        gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
-        // canUndo = gameStateHistory.size > 0
+        blockSwiping = true
+        viewModelScope.launch {
+            if (gameStateHistory.size > 0) {
+                gameState = gameStateHistory.last()
+                // gameGridState.clear()
+                gameGridState.resetGameState(gameState)
+                gameGridState.updateVisibility()
+                gameStateHistory.removeAt(gameStateHistory.lastIndex)
+                gameLost = false
+            }
+            gameRepository.saveGame(
+                gameState = gameState,
+                gameHistory = gameStateHistory,
+                winDismissed = gameWinDismissed
+            )
+            delay(100)
+            gameGridState.enableAnimations()
+            blockSwiping = false
+        }// canUndo = gameStateHistory.size > 0
     }
 
     fun dismissWin() {

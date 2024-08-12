@@ -42,7 +42,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
                         gameState = viewModel.gameState,
-                        tileMovements = viewModel.tileMovements
+                        tileMovements = viewModel.tileMovements,
+                        gameGridState = viewModel.gameGridState
                     )
                     Spacer(Modifier.size(20.dp))
                     GameHeader(
@@ -78,7 +79,8 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                         gridDimensions = viewModel.gameState.dimensions,
                         onSwipe = {dir -> viewModel.swiped(dir)},
                         gameState = viewModel.gameState,
-                        tileMovements = viewModel.tileMovements
+                        tileMovements = viewModel.tileMovements,
+                        gameGridState = viewModel.gameGridState
                     )
                 }
             }

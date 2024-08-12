@@ -5,13 +5,14 @@ import android.util.Log
 data class GameStateUpdate(
     val gameState: GameState,
     val tileMovements: TileMovements,
+    val newTile: Tile?,
     val validMove: Boolean
 )
 
 
 data class GameState(
     val dimensions: Int,
-    private val gameStateHolder: Array<IntArray> = Array(dimensions) { IntArray(dimensions) {0} },
+    val gameStateHolder: Array<IntArray> = Array(dimensions) { IntArray(dimensions) {0} },
     val score: Int = 0,
     var isEmpty: Boolean = true
 ) {
@@ -46,11 +47,13 @@ data class GameState(
                 } else {
                     // if not empty, merge if next is same, else no shift.
                     for (j in i+1 until mutableRowForMovements.size) {
-                        if (mutableRowForMovements[j] != 0 && mutableRowForMovements[i] == mutableRowForMovements[j]) {
-                            movementsArray[j] += 1
-                            mutableRowForMovements[j] = 0
+                        if (mutableRowForMovements[i] == mutableRowForMovements[j]) {
+                            for (k in j until mutableRowForMovements.size) {
+                                if (mutableRowForMovements[k] != 0) movementsArray[k] += 1
+                                mutableRowForMovements[j] = -1
+                            }
                             break
-                        } else {
+                        } else if (mutableRowForMovements[j] != 0) {
                             break
                         }
                     }
@@ -158,18 +161,20 @@ data class GameState(
             )
         }
 
-        private fun Array<IntArray>.addTile() {
+        private fun Array<IntArray>.addTile(): Tile {
             val row = this.indices.random()
             val col = this.indices.random()
             if (this[row][col] != 0) {
-                this.addTile()
+                return this.addTile()
             } else {
-                this[row][col] = if ((1..20).random() >= 18) 4 else 2
+                val newValue = if ((1..20).random() >= 18) 4 else 2
+                this[row][col] = newValue
+                return Tile(Cell(row, col), newValue)
             }
         }
     }
 
-    fun getTileValue(column: Int, row: Int): Int? {
+    fun getTileValue(row: Int, column: Int): Int? {
         return if (column < dimensions && row < dimensions)
             gameStateHolder[row][column]
         else null
@@ -204,10 +209,10 @@ data class GameState(
         newGameStateHolder = gridCalcResult.gameStateHolder
 
         if (!newGameStateHolder.contentDeepEquals(gameStateHolder)) {
-            newGameStateHolder.addTile()
-            return GameStateUpdate(this.copy(gameStateHolder = newGameStateHolder, score = this.score + scoreChange), tileMovements, true)
+            val newTile = newGameStateHolder.addTile()
+            return GameStateUpdate(this.copy(gameStateHolder = newGameStateHolder, score = this.score + scoreChange), tileMovements, newTile, true)
         }
-        return GameStateUpdate(this, tileMovements, false)
+        return GameStateUpdate(this, tileMovements, null, false)
         // return GameStateUpdate(GameState(dimensions, newGameState, score + scoreChange, isEmpty), tileMovements)
     }
 
@@ -241,5 +246,13 @@ data class GameState(
         initArray.addTile()
 
         return this.copy(score = 0, isEmpty = false, gameStateHolder = initArray)
+    }
+
+    inline fun forEachTile(action: (tile: Tile) -> Unit) {
+        gameStateHolder.forEachIndexed { rowIndex, row ->
+            row.forEachIndexed { columnIndex, value ->
+                action(Tile(Cell(rowIndex, columnIndex), value))
+            }
+        }
     }
 }
