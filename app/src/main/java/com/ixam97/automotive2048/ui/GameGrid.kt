@@ -203,7 +203,7 @@ fun GridTile(
         }
 
         LaunchedEffect(Unit) {
-            delay(20)
+            delay(100)
             visible = true
         }
     }

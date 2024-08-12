@@ -115,7 +115,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                     gameGridState.updateGameState(gameState, gameStateUpdate.newTile)
                     blockSwiping = false
                     tileMovements = TileMovements.noopMovements(gameState.dimensions)
-                    delay(100)
+                    delay(150)
                     gameGridState.updateVisibility()
                 }
             } else {
