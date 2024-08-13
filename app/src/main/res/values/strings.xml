@@ -15,7 +15,7 @@
     <string name="dialog_lost_undo">Undo move</string>
 
     <string name="dialog_won_title">Game won!</string>
-    <string name="dialog_won_text">You have created a tile with the value 2048 and won the game! You can now continue to play this session or start a new game.</string>
+    <string name="dialog_won_text">You have created a tile with the value 2048 and won the game! You can now continue to play this session for a new highscore or start a new game.</string>
     <string name="dialog_won_restart">Restart game</string>
     <string name="dialog_won_continue">Continue playing</string>
 

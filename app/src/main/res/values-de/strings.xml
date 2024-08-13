@@ -9,12 +9,12 @@
     <string name="dialog_reset_cancel">Abbrechen</string>
 
     <string name="dialog_lost_title">Spiel verloren!</string>
-    <string name="dialog_lost_text">You can either undo your last moves, or reset the game and start from the beginning!</string>
+    <string name="dialog_lost_text">Du kannst entweder deine letzten Spielzüge Rückgänfig machen, oder ein neues Spiel starten!</string>
     <string name="dialog_lost_restart">Spielneustart</string>
     <string name="dialog_lost_undo">Rückgängig</string>
 
     <string name="dialog_won_title">Spiel gewonnen!</string>
-    <string name="dialog_won_text">You have created a tile with the value 2048 and won the game! You can now continue to play this session or start a new game.</string>
+    <string name="dialog_won_text">Du hast eine Kachel mit dem wert 2048 erschaffen und damit das Spiel gewonnen! Du kannst nun das Spiel weiter spielen, um eine neue Bestpunktzahl aufzustellen, oder ein neues Spiel starten.</string>
     <string name="dialog_won_restart">Spielneustart</string>
     <string name="dialog_won_continue">Weiterspielen</string>
 
