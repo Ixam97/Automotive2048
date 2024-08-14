@@ -13,8 +13,8 @@ android {
         applicationId = "com.ixam97.automotive2048"
         minSdk = 29
         targetSdk = 34
-        versionCode = 10
-        versionName = "2.0.4"
+        versionCode = 11
+        versionName = "2.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
