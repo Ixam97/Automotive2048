@@ -3,6 +3,7 @@ package com.ixam97.automotive2048.ui
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,122 +39,150 @@ import com.ixam97.automotive2048.ui.components.SwitchRow
 
 @Composable
 fun SettingsScreen(viewModel: MainViewModel) {
-    Scaffold (
-        topBar = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                Row(
+    Box (
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Scaffold (
+            topBar = {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                        .wrapContentHeight()
                 ) {
-                    IconButton(
-                        modifier = Modifier.size(iconButtonSize),
-                        onClick = {viewModel.settingsBackClicked()}
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(
+                        IconButton(
                             modifier = Modifier.size(iconButtonSize),
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            tint = MaterialTheme.colorScheme.primary,
-                            contentDescription = null
+                            onClick = {viewModel.settingsBackClicked()}
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(iconButtonSize),
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = null
+                            )
+                        }
+                        Spacer(Modifier.size(40.dp))
+                        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge)
+                        Spacer(Modifier.weight(1f))
+                        IconButton(
+                            modifier = Modifier.size(iconButtonSize),
+                            onClick = {viewModel.openHowToPlayDialog()}
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(iconButtonSize),
+                                imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                                contentDescription = null
+                            )
+                        }
+
+                    }
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.primary,
+                        thickness = 2.dp
+                    )
+                }
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                val context = LocalContext.current
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 24.dp, bottom = 10.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    text = stringResource(R.string.settings_title)
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                SwitchRow(
+                    title = stringResource(R.string.undo_enable_title),
+                    onClick = { viewModel.toggleUndoButtonSetting() },
+                    switchState = viewModel.undoButtonEnabled
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                if (GameRepository.supportedOEMsList.contains(Build.BRAND)) {
+                    SwitchRow(
+                        title = stringResource(R.string.use_oem_theme_title),
+                        onClick = { viewModel.toggleOemSchemeSetting() },
+                        switchState = viewModel.oemSchemeEnabled
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                }
+                Text(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 24.dp, bottom = 10.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    text = stringResource(R.string.about_title)
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                MenuRow(
+                    title = stringResource(R.string.version_headline),
+                    text = BuildConfig.VERSION_NAME
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                MenuRow(
+                    title = stringResource(R.string.copyright_headline),
+                    text = "©2024 Maximilian Goldschmidt"
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                MenuRow(
+                    title = stringResource(R.string.github_headline),
+                    text = stringResource(R.string.github_text),
+                    external = true,
+                    browsable = true,
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(context.getString(R.string.github_url))
+                            )
                         )
                     }
-                    Spacer(Modifier.size(40.dp))
-                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineLarge)
-                }
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.primary,
-                    thickness = 2.dp
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                MenuRow(
+                    title = stringResource(R.string.inspired_headline),
+                    text = stringResource(R.string.inspired_text),
+                    external = true,
+                    browsable = true,
+                    onClick = {
+                        context.startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(context.getString(R.string.inspired_url))
+                            )
+                        )
+                    }
+                )
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+                MenuRow(
+                    title = stringResource(R.string.licenses_headline),
+                    browsable = true,
+                    onClick = { viewModel.licensesClicked() }
                 )
             }
         }
-    ) { innerPadding ->
-        Column (
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            val context = LocalContext.current
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 10.dp),
-                color = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.settings_title)
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            SwitchRow(
-                title = stringResource(R.string.undo_enable_title),
-                onClick = {viewModel.toggleUndoButtonSetting()},
-                switchState = viewModel.undoButtonEnabled
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            if (GameRepository.supportedOEMsList.contains(Build.BRAND)) {
-                SwitchRow(
-                    title = stringResource(R.string.use_oem_theme_title),
-                    onClick = { viewModel.toggleOemSchemeSetting() },
-                    switchState = viewModel.oemSchemeEnabled
-                )
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+        if (viewModel.showHowToPlayDialog) {
+            GameDialog(
+                titleText = stringResource(R.string.dialog_how_to_title),
+                dialogButtons = listOf(
+                    DialogButton(stringResource(R.string.dialog_how_to_button_close), { viewModel.closeHowToPlayDialog() }, active = true),
+
+                    )
+            ) {
+                Text(stringResource(R.string.dialog_how_to_text))
             }
-            Text(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 24.dp, bottom = 10.dp),
-                color = MaterialTheme.colorScheme.primary,
-                text = stringResource(R.string.about_title)
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            MenuRow(
-                title = stringResource(R.string.version_headline),
-                text = BuildConfig.VERSION_NAME
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            MenuRow(
-                title = stringResource(R.string.copyright_headline),
-                text = "©2024 Maximilian Goldschmidt"
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            MenuRow(
-                title = stringResource(R.string.github_headline),
-                text = stringResource(R.string.github_text),
-                external = true,
-                browsable = true,
-                onClick = {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(context.getString(R.string.github_url))
-                        )
-                    )
-                }
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            MenuRow(
-                title = stringResource(R.string.inspired_headline),
-                text = stringResource(R.string.inspired_text),
-                external = true,
-                browsable = true,
-                onClick = {
-                    context.startActivity(
-                        Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(context.getString(R.string.inspired_url))
-                        )
-                    )
-                }
-            )
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
-            MenuRow(
-                title = stringResource(R.string.licenses_headline),
-                browsable = true,
-                onClick = { viewModel.licensesClicked() }
-            )
         }
     }
 }

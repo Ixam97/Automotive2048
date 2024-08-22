@@ -43,6 +43,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var showRestartDialog by mutableStateOf(false)
         private set
+    var showHowToPlayDialog by mutableStateOf(gameRepository.getFirstLaunch())
+        private set
 
     var tileMovements by mutableStateOf(TileMovements.noopMovements(gameState.dimensions))
         private set
@@ -62,6 +64,13 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
     fun licensesBackClicked() {
         currentScreenIndex = 1
+    }
+    fun closeHowToPlayDialog() {
+        gameRepository.setFirstLaunch(false)
+        showHowToPlayDialog = false
+    }
+    fun openHowToPlayDialog() {
+        showHowToPlayDialog = true
     }
 
     init {

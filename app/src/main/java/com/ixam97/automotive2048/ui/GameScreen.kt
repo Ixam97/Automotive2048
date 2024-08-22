@@ -91,6 +91,18 @@ fun GameScreen(viewModel: MainViewModel, aspectRatio: Float) {
                 }
             }
 
+            if (viewModel.showHowToPlayDialog) {
+                GameDialog(
+                    titleText = stringResource(R.string.dialog_how_to_title),
+                    dialogButtons = listOf(
+                        DialogButton(stringResource(R.string.dialog_how_to_button_begin), { viewModel.closeHowToPlayDialog() }, active = true),
+
+                    )
+                ) {
+                    Text(stringResource(R.string.dialog_how_to_text))
+                }
+            }
+
             if (viewModel.showRestartDialog) {
                 GameDialog(
                     titleText = stringResource(R.string.dialog_reset_title),

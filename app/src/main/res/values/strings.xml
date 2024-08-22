@@ -5,6 +5,11 @@
     <string name="highscore">Highscore</string>
     <string name="gametype_endless">Endless Game</string>
 
+    <string name="dialog_how_to_title">How to play 2048?</string>
+    <string name="dialog_how_to_text">Swipe left, right, up or down to move the tiles. Combine tiles of the same value to create a new tile with the sum of them. The game is won when you create a tile with a value of 2048. You lose if you cannot make another move.</string>
+    <string name="dialog_how_to_button_begin">Start playing!</string>
+    <string name="dialog_how_to_button_close">Close</string>
+
     <string name="dialog_reset_title">Restart Game?</string>
     <string name="dialog_reset_confirm">Restart</string>
     <string name="dialog_reset_cancel">Cancel</string>

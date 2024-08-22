@@ -12,6 +12,7 @@ private const val KEY_GAME_HISTORY = "key_game_history"
 private const val KEY_WIN_DISMISSED = "key_win_dismissed"
 private const val KEY_ALLOW_UNDO = "key_allow_undo"
 private const val KEY_OEM_SCHEME = "key_oem_scheme"
+private const val KEY_FIRST_LAUNCH = "key_first_launch"
 
 
 class GameRepository(context: Context) {
@@ -40,6 +41,15 @@ class GameRepository(context: Context) {
     fun getOemSchemeEnabled(): Boolean = sharedPrefs.getBoolean(KEY_OEM_SCHEME, false)
     fun getHighScore(): Int = sharedPrefs.getInt(KEY_HIGHSCORE, 0)
     fun getWinDismissed(): Boolean = sharedPrefs.getBoolean(KEY_WIN_DISMISSED, false)
+    fun getFirstLaunch(): Boolean = sharedPrefs.getBoolean(KEY_FIRST_LAUNCH, true)
+
+    fun setFirstLaunch(
+        value: Boolean
+    ) {
+        sharedPrefs.edit()
+            .putBoolean(KEY_FIRST_LAUNCH, value)
+            .apply()
+    }
 
     fun saveSettings(
         allowUndo: Boolean,
