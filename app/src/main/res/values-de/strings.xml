@@ -6,7 +6,7 @@
 
 
     <string name="dialog_how_to_title">Wie wird 2048 gespielt?</string>
-    <string name="dialog_how_to_text">Wische nach links, recht, oben oder unten um die Kacheln zu bewegen. Kombiniere Kacheln mit demselben Wert, um eine Kachel mit der Summe der beiden Werte zu erschaffen. Das Spiel ist gewonnen, wenn eine Kachel mit dem Wert 2048 erschaffen wird. Wenn keine weiteren Züge möglich sind, ist das Spiel verloren.</string>
+    <string name="dialog_how_to_text">Wische nach links, rechts, oben oder unten, um die Kacheln zu bewegen. Kombiniere Kacheln mit demselben Wert, um eine Kachel mit der Summe der beiden Werte zu erschaffen. Das Spiel ist gewonnen, wenn eine Kachel mit dem Wert 2048 erschaffen wird. Wenn keine weiteren Züge möglich sind, ist das Spiel verloren.</string>
     <string name="dialog_how_to_button_begin">Spiel starten!</string>
     <string name="dialog_how_to_button_close">Schließen</string>
 
