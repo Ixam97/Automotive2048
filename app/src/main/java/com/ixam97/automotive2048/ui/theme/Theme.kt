@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val iconButtonSize = 80.dp
+val iconButtonSize = 65.dp
 
 private val defaultColorScheme = darkColorScheme(
     background = Color.Black,

@@ -81,7 +81,7 @@ data class GameState(
             return RowCalcResult(mutableRow.toList(), movementsArray, scoreChange)
         }
 
-        private fun rotateSquareIntArray(originalSquareIntArray: Array<IntArray>, reverse: Boolean): Array<IntArray> {
+        private fun rotateSquareIntArray(originalSquareIntArray: Array<IntArray>): Array<IntArray> {
             val newGameStateHolder = Array(originalSquareIntArray.size) { IntArray(originalSquareIntArray.size) {0} }
             originalSquareIntArray.forEachIndexed { rowIndex, row ->
                 row.forEachIndexed { columnIndex, value ->
@@ -93,7 +93,7 @@ data class GameState(
 
         private fun calcSwipeUp(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
-            val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder, false)
+            val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder)
             val tmpNewGameState = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
             val tmpTileMovements = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
             tmpGameStateHolder.forEachIndexed { index, row ->
@@ -103,15 +103,15 @@ data class GameState(
                 score += result.score
             }
             return GridCalcResult(
-                rotateSquareIntArray(tmpNewGameState, true),
-                TileMovements(SwipeDirection.UP, rotateSquareIntArray(tmpTileMovements, true)),
+                rotateSquareIntArray(tmpNewGameState),
+                TileMovements(SwipeDirection.UP, rotateSquareIntArray(tmpTileMovements)),
                 score
             )
         }
 
         private fun calcSwipeDown(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
-            val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder, false)
+            val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder)
             val tmpNewGameState = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
             val tmpTileMovements = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
             tmpGameStateHolder.forEachIndexed { index, row ->
@@ -121,8 +121,8 @@ data class GameState(
                 score += result.score
             }
             return GridCalcResult(
-                rotateSquareIntArray(tmpNewGameState, true),
-                TileMovements(SwipeDirection.DOWN, rotateSquareIntArray(tmpTileMovements, true)),
+                rotateSquareIntArray(tmpNewGameState),
+                TileMovements(SwipeDirection.DOWN, rotateSquareIntArray(tmpTileMovements)),
                 score
             )
         }
@@ -169,7 +169,10 @@ data class GameState(
             } else {
                 val newValue = if ((1..20).random() >= 18) 4 else 2
                 this[row][col] = newValue
-                return Tile(Cell(row, col), newValue)
+                return Tile(
+                    cell = Cell(row, col),
+                    value = newValue
+                )
             }
         }
     }
@@ -180,15 +183,9 @@ data class GameState(
         else null
     }
 
-    fun setTileValue(column:Int, row: Int, value: Int) {
-        if (column < dimensions && row < dimensions)
-            gameStateHolder[row][column] = value
-    }
-
     fun makeMove(direction: SwipeDirection): GameStateUpdate {
         var scoreChange = 0
         val tileMovements: TileMovements
-        var newGameStateHolder = Array(dimensions) { IntArray(dimensions) {0} }
 
         // perform the actual move
         val gridCalcResult =  when (direction) {
@@ -206,7 +203,8 @@ data class GameState(
 
         scoreChange += gridCalcResult.score
         tileMovements = gridCalcResult.tileMovements
-        newGameStateHolder = gridCalcResult.gameStateHolder
+
+        val newGameStateHolder = gridCalcResult.gameStateHolder
 
         if (!newGameStateHolder.contentDeepEquals(gameStateHolder)) {
             val newTile = newGameStateHolder.addTile()
@@ -251,7 +249,7 @@ data class GameState(
     inline fun forEachTile(action: (tile: Tile) -> Unit) {
         gameStateHolder.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { columnIndex, value ->
-                action(Tile(Cell(rowIndex, columnIndex), value))
+                action(Tile(cell = Cell(rowIndex, columnIndex), value = value))
             }
         }
     }

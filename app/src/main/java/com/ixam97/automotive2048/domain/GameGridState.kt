@@ -2,16 +2,13 @@ package com.ixam97.automotive2048.domain
 
 class GameGridState(private var gameState: GameState) {
 
-    val tiles = mutableListOf<Tile>()
-    private var tileOccupation = Array(gameState.dimensions) { Array(gameState.dimensions) { false } }
+    val tiles = arrayListOf<Tile>()
 
-    private fun clearedTileOccupation() = Array(gameState.dimensions) { Array(gameState.dimensions) { false } }
-
-    var animate = true
+    var animate = false
         private set
 
     init {
-        resetGameState(gameState)
+        initGameState(gameState)
     }
 
     fun updateGameState(newGameState: GameState, newTile: Tile?) {
@@ -26,25 +23,17 @@ class GameGridState(private var gameState: GameState) {
     }
 
     fun applyMovements(tileMovements: TileMovements) {
-        val numTiles = tiles.size
-        for (i in 0 until numTiles) {
-            tiles[i].applyTileMovements(tileMovements)
-            tileOccupation = clearedTileOccupation()
-            if (tileOccupation[tiles[i].cell.row][tiles[i].cell.col]) {
-                tiles.removeAt(i)
-            } else {
-                tileOccupation[tiles[i].cell.row][tiles[i].cell.col] = true
-            }
+        tiles.forEach {
+            it.applyTileMovements(tileMovements)
         }
     }
 
-    fun resetGameState(newGameState: GameState) {
+    private fun initGameState(newGameState: GameState) {
         animate = false
         tiles.clear()
         newGameState.forEachTile { tile ->
             if (tile.value != 0) {
                 tiles.add(tile)
-                tileOccupation[tile.cell.row][tile.cell.col] = true
             }
         }
 
@@ -54,7 +43,7 @@ class GameGridState(private var gameState: GameState) {
     fun enableAnimations() {
         animate = true
     }
-
+/*
     fun disableAnimations() {
         animate = false
     }
@@ -62,4 +51,5 @@ class GameGridState(private var gameState: GameState) {
     fun updateVisibility() {
         tiles.forEach { it.visible = true }
     }
+ */
 }

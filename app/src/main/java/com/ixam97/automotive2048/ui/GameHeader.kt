@@ -2,6 +2,8 @@ package com.ixam97.automotive2048.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Menu
@@ -29,12 +32,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ixam97.automotive2048.R
 import com.ixam97.automotive2048.ui.theme.disabledTextColor
 import com.ixam97.automotive2048.ui.theme.iconButtonSize
+
+private val scoreCardHeight = 130.dp
+private val dividerThickness = 5.dp
+private val dividerPadding = 15.dp
+private val spacerSize = 20.dp
+private val iconHeight = iconButtonSize
+
+private val verticalHeaderHeight = scoreCardHeight * 2 + iconHeight + spacerSize * 2 + dividerThickness + dividerPadding * 2
 
 @Composable
 fun GameHeader(
@@ -47,53 +62,22 @@ fun GameHeader(
     aspectRatio: Float,
     allowUndo: Boolean
 ) {
-    if (aspectRatio > 1) {
-        Column (
-            modifier = Modifier
-                .widthIn(max = 400.dp)
-        ) {
-            TitleCard()
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth(),
-                color = MaterialTheme.colorScheme.primary,
-                thickness = 5.dp
-            )
-            ButtonRow (
-                modifier = Modifier.fillMaxWidth(),
-                onSettingsClick = onSettingsClick,
-                onResetClick = onRestartClick,
-                onUndoClick = onUndoClick,
-                historySize = historySize,
-                allowUndo = allowUndo
-            )
-            Spacer(Modifier.size(20.dp))
-            ScoreCard(
-                modifier = Modifier.fillMaxWidth(),
-                name = stringResource(R.string.score),
-                value = score
-            )
-            Spacer(Modifier.size(20.dp))
-            ScoreCard(
-                modifier = Modifier.fillMaxWidth(),
-                name = stringResource(R.string.highscore),
-                value = highscore
-            )
-        }
-    } else {
-        Row (
-            modifier = Modifier
-                . fillMaxWidth()
-                .height(IntrinsicSize.Max)
-        ) {
-            TitleCard()
-            VerticalDivider(
-                modifier = Modifier.padding(horizontal = 15.dp),
-                color = MaterialTheme.colorScheme.primary,
-                thickness = 5.dp
-            )
-            Column (
-                modifier = Modifier.weight(1f)
+    BoxWithConstraints {
+        if (aspectRatio > 1) {
+            val height = maxHeight
+            Column(
+                modifier = Modifier
+                    .widthIn(max = maxWidth.coerceAtMost(400.dp))
+                    .onGloballyPositioned { }
             ) {
+                TitleCard(availableHeight = height - verticalHeaderHeight)
+                HorizontalDivider(
+                    modifier = Modifier
+                        .padding(vertical = dividerPadding)
+                        .fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primary,
+                    thickness = dividerThickness
+                )
                 ButtonRow(
                     modifier = Modifier.fillMaxWidth(),
                     onSettingsClick = onSettingsClick,
@@ -102,13 +86,58 @@ fun GameHeader(
                     historySize = historySize,
                     allowUndo = allowUndo
                 )
-                Spacer(Modifier.size(20.dp))
-                Row (
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(Modifier.size(spacerSize))
+                ScoreCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    name = stringResource(R.string.score),
+                    value = score
+                )
+                Spacer(Modifier.size(spacerSize))
+                ScoreCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    name = stringResource(R.string.highscore),
+                    value = highscore
+                )
+            }
+        } else {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max)
+            ) {
+                TitleCard(availableHeight = scoreCardHeight + spacerSize + iconHeight)
+                VerticalDivider(
+                    modifier = Modifier.padding(horizontal = dividerPadding),
+                    color = MaterialTheme.colorScheme.primary,
+                    thickness = dividerThickness
+                )
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    ScoreCard( modifier = Modifier.fillMaxHeight().weight(1f), stringResource(R.string.score), score)
+                    ButtonRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        onSettingsClick = onSettingsClick,
+                        onResetClick = onRestartClick,
+                        onUndoClick = onUndoClick,
+                        historySize = historySize,
+                        allowUndo = allowUndo
+                    )
                     Spacer(Modifier.size(20.dp))
-                    ScoreCard( modifier = Modifier.fillMaxHeight().weight(1f), stringResource(R.string.highscore), highscore)
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        ScoreCard(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .weight(1f), stringResource(R.string.score), score
+                        )
+                        Spacer(Modifier.size(20.dp))
+                        ScoreCard(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .weight(1f), stringResource(R.string.highscore), highscore
+                        )
+                    }
                 }
             }
         }
@@ -116,30 +145,50 @@ fun GameHeader(
 }
 
 @Composable
-private fun TitleCard() {
-    Column {
-        Text(
-            text = "2048",
-            style = MaterialTheme.typography.titleLarge.copy(fontSize = 120.sp)
-        )
-        Text(
-            text = stringResource(R.string.gametype_endless),
-            style = MaterialTheme.typography.titleSmall,
-            color = disabledTextColor
-        )
+private fun TitleCard(
+    availableHeight: Dp
+) {
+
+    // var titleSize by remember { mutableStateOf(120.sp) }
+    // var textOverflow by remember { mutableStateOf(false) }
+    // val localDensity = LocalDensity.current
+
+    Box(
+        modifier = Modifier
+            .height(availableHeight.coerceAtMost(174.dp))
+            .wrapContentWidth()
+            // .widthIn(min = 300.dp)
+    ) {
+        println(" Screen density: ${LocalDensity.current.density}")
+        Column {
+            Text(
+                text = "2048",
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontSize = (availableHeight.value * 0.6).coerceAtMost(120.0).sp
+                )
+            )
+            Text(
+                text = stringResource(R.string.gametype_endless),
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontSize = (availableHeight.value * 0.15).coerceAtMost(30.0).sp
+                ),
+                color = disabledTextColor
+            )
+        }
     }
+
 }
 
 @Composable
 private fun ScoreCard(modifier: Modifier = Modifier, name: String, value: Int) {
     Column (
         modifier = modifier
-            .height(IntrinsicSize.Max)
+            .height(scoreCardHeight)
             .background(MaterialTheme.colorScheme.surface)
             .padding(vertical = 15.dp, horizontal = 30.dp),
         verticalArrangement = Arrangement.Bottom
     ) {
-        val defaultTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 60.sp)
+        val defaultTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 55.sp)
         var textStyle by remember { mutableStateOf(defaultTextStyle) }
         Text(
             modifier = Modifier
@@ -153,7 +202,7 @@ private fun ScoreCard(modifier: Modifier = Modifier, name: String, value: Int) {
                 }
             }
         )
-        Text(name, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        Text(name, style = MaterialTheme.typography.titleSmall.copy(fontSize = 27.sp), color = MaterialTheme.colorScheme.primary)
     }
 }
 
@@ -175,12 +224,12 @@ private fun ButtonRow(
             Text(historySize.toString(), color = MaterialTheme.colorScheme.primary)
             Spacer(Modifier.size(10.dp))
             IconButton(
-                modifier = Modifier.size(iconButtonSize),
+                modifier = Modifier.size(iconHeight),
                 onClick = onUndoClick,
                 enabled = historySize > 0
             ) {
                 Icon(
-                    modifier = Modifier.size(iconButtonSize),
+                    modifier = Modifier.size(iconHeight),
                     imageVector = Icons.AutoMirrored.Filled.Undo,
                     contentDescription = null
                 )
@@ -188,22 +237,22 @@ private fun ButtonRow(
             Spacer(Modifier.size(20.dp))
         }
         IconButton(
-            modifier = Modifier.size(iconButtonSize),
+            modifier = Modifier.size(iconHeight),
             onClick = onResetClick
         ) {
             Icon(
-                modifier = Modifier.size(iconButtonSize),
+                modifier = Modifier.size(iconHeight),
                 imageVector = Icons.Default.Sync,
                 contentDescription = null
             )
         }
         Spacer(Modifier.size(20.dp))
         IconButton(
-            modifier = Modifier.size(iconButtonSize),
+            modifier = Modifier.size(iconHeight),
             onClick = onSettingsClick
         ) {
             Icon(
-                modifier = Modifier.size(iconButtonSize),
+                modifier = Modifier.size(iconHeight),
                 imageVector = Icons.Default.Menu,
                 contentDescription = null
             )

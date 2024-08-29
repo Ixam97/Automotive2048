@@ -12,8 +12,12 @@ import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.repository.GameRepository
 import com.ixam97.automotive2048.domain.GameGridState
+import com.ixam97.automotive2048.ui.fadeInAnimationDelay
+import com.ixam97.automotive2048.ui.fadeInAnimationDuration
+import com.ixam97.automotive2048.ui.swipeAnimationDuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private val TAG = "MainViewModel"
@@ -35,8 +39,6 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     var currentScreenIndex by mutableIntStateOf(0)
         private set
-    // var canUndo by mutableStateOf(false)
-    //    private set
     var gameWon by mutableStateOf(false)
         private set
     var gameLost by mutableStateOf(false)
@@ -75,7 +77,6 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            gameGridState.resetGameState(gameState)
             delay(100)
             gameGridState.enableAnimations()
             blockSwiping = false
@@ -89,6 +90,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         gameState.makeMove(dir).let { gameStateUpdate ->
             if (gameStateUpdate.validMove) {
                 blockSwiping = true
+
                 tileMovements = gameStateUpdate.tileMovements
                 val newGameState = gameStateUpdate.gameState
 
@@ -122,24 +124,16 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
                 // use a coroutine to delay game logic during animation
                 viewModelScope.launch {
-                    delay(150)
+                    delay(max(swipeAnimationDuration, fadeInAnimationDelay + fadeInAnimationDuration).toLong() + 100)
+                    gameGridState = GameGridState(gameState) // this ensures the tile list is not growing indefinitely
                     blockSwiping = false
-                    gameGridState.updateVisibility()
                 }
             } else {
                 Log.i("GAME CONDITION", "INVALID MOVE")
             }
 
         }
-
-        // canUndo = gameStateHistory.size > 0
     }
-
-    /*
-    fun testFunction() {
-        Log.w(TAG, "Test Function")
-    }
-    */
 
     private fun saveSettings() {
         gameRepository.saveSettings(
@@ -167,15 +161,13 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
             gameLost = false
             gameWon = false
             gameWinDismissed = false
-            gameGridState.resetGameState(gameState)
-            gameGridState.updateVisibility()
+            gameGridState = GameGridState(gameState)
             gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
 
             delay(100)
             gameGridState.enableAnimations()
             blockSwiping = false
         }
-        // canUndo = gameStateHistory.size > 0
     }
 
     fun undoMove() {
@@ -183,9 +175,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         viewModelScope.launch {
             if (gameStateHistory.size > 0) {
                 gameState = gameStateHistory.last()
-                // gameGridState.clear()
-                gameGridState.resetGameState(gameState)
-                gameGridState.updateVisibility()
+                gameGridState = GameGridState(gameState)
                 gameStateHistory.removeAt(gameStateHistory.lastIndex)
                 gameLost = false
             }
@@ -197,7 +187,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
             delay(100)
             gameGridState.enableAnimations()
             blockSwiping = false
-        }// canUndo = gameStateHistory.size > 0
+        }
     }
 
     fun dismissWin() {

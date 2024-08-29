@@ -42,6 +42,10 @@ import com.ixam97.automotive2048.utils.length
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 
+const val swipeAnimationDuration = 200
+const val fadeInAnimationDelay = 100
+const val fadeInAnimationDuration = 200
+
 @Composable
 fun GameGrid(
     gridDimensions: Int,
@@ -130,15 +134,17 @@ private fun GridTilesNew(
             .fillMaxSize()
     ){
         val boxSize = (maxWidth - 20.dp * (dimensions -1)) / dimensions
+        println("Tile list size: ${gameGridState.tiles.size}")
+        println("Tiles: ${gameGridState.tiles.toList()}")
 
         gameGridState.tiles.forEach { tile ->
-            GridTile(
-                tile = tile,
-                gameGridState = gameGridState,
-                boxSize = boxSize
-            )
+            // if (!tile.consumed) {
+                GridTile(
+                    tile = tile,
+                    boxSize = boxSize
+                )
+            // }
         }
-
     }
 }
 
@@ -163,28 +169,35 @@ private fun getDirectionFromDeltas(xDelta: Float, yDelta: Float): SwipeDirection
 @Composable
 fun GridTile(
     tile: Tile,
-    gameGridState: GameGridState,
     boxSize: Dp
 ) {
-    val xOffset = ((boxSize + 20.dp) * tile.cell.col)
-    val yOffset = ((boxSize + 20.dp) * tile.cell.row)
-    val xOffsetAnim = animateDpAsState(((boxSize + 20.dp) * tile.cell.col))
-    val yOffsetAnim = animateDpAsState(((boxSize + 20.dp) * tile.cell.row))
+    // val tile = gameGridState.tiles[id]!!
+    val xOffsetFixed = ((boxSize + 20.dp) * tile.cell.col)
+    val yOffsetFixed = ((boxSize + 20.dp) * tile.cell.row)
+
+    val xOffsetAnim by animateDpAsState(
+        ((boxSize + 20.dp) * tile.cell.col),
+        animationSpec = tween(if (tile.animateHorizontal) swipeAnimationDuration else 0), label = "xOffsetAnim"
+    )
+    val yOffsetAnim by animateDpAsState(
+        ((boxSize + 20.dp) * tile.cell.row),
+        animationSpec = tween(if (tile.animateVertical) swipeAnimationDuration else 0), label = "yOffsetAnim"
+    )
+
+    val xOffset = if (tile.animateHorizontal) xOffsetAnim else xOffsetFixed
+    val yOffset = if (tile.animateVertical) yOffsetAnim else yOffsetFixed
 
     Box (
         modifier = Modifier
             .size(boxSize)
-            .offset(
-                x = if (gameGridState.animate) xOffsetAnim.value else xOffset,
-                y = if (gameGridState.animate) yOffsetAnim.value else yOffset
-            ),
+            .offset(x = xOffset, y = yOffset),
         contentAlignment = Alignment.Center
     ) {
 
         var visible by remember { mutableStateOf(tile.visible) }
         val size by animateDpAsState(
             if (visible) boxSize else 1.dp,
-            animationSpec = tween(100)
+            animationSpec = tween(fadeInAnimationDuration)
         )
 
         Box(
@@ -203,7 +216,7 @@ fun GridTile(
         }
 
         LaunchedEffect(Unit) {
-            delay(100)
+            delay(fadeInAnimationDelay.toLong())
             visible = true
         }
     }
