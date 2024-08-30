@@ -8,13 +8,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Menu
@@ -38,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import com.ixam97.automotive2048.R
 import com.ixam97.automotive2048.ui.theme.disabledTextColor
@@ -90,22 +90,40 @@ fun GameHeader(
                 ScoreCard(
                     modifier = Modifier.fillMaxWidth(),
                     name = stringResource(R.string.score),
-                    value = score
+                    value = score,
+                    height = scoreCardHeight
                 )
                 Spacer(Modifier.size(spacerSize))
                 ScoreCard(
                     modifier = Modifier.fillMaxWidth(),
                     name = stringResource(R.string.highscore),
-                    value = highscore
+                    value = highscore,
+                    height = scoreCardHeight
                 )
             }
         } else {
+            val width = maxWidth
+
+            val scoreAreaWidth = maxWidth * 0.7f
+
+            val adjustedScoreCardHeight = if (scoreAreaWidth > 600.dp) {
+                scoreCardHeight
+            } else {
+                scoreCardHeight * (scoreAreaWidth.value / 600f)
+            }
+
+            println("Adjusted Score Card Height: $adjustedScoreCardHeight (${adjustedScoreCardHeight.value}")
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max)
             ) {
-                TitleCard(availableHeight = scoreCardHeight + spacerSize + iconHeight)
+                TitleCard(
+                    modifier = Modifier
+                       .width(width * 0.3f),
+                    availableHeight = min(scoreCardHeight + spacerSize + iconHeight, (width * 0.3f) / 1.35f)
+                )
                 VerticalDivider(
                     modifier = Modifier.padding(horizontal = dividerPadding),
                     color = MaterialTheme.colorScheme.primary,
@@ -128,14 +146,16 @@ fun GameHeader(
                     ) {
                         ScoreCard(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f), stringResource(R.string.score), score
+                                .weight(1f), stringResource(R.string.score),
+                            value = score,
+                            height = adjustedScoreCardHeight
                         )
                         Spacer(Modifier.size(20.dp))
                         ScoreCard(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .weight(1f), stringResource(R.string.highscore), highscore
+                                .weight(1f), stringResource(R.string.highscore),
+                            value = highscore,
+                            height = adjustedScoreCardHeight
                         )
                     }
                 }
@@ -146,6 +166,7 @@ fun GameHeader(
 
 @Composable
 private fun TitleCard(
+    modifier: Modifier = Modifier,
     availableHeight: Dp
 ) {
 
@@ -154,9 +175,8 @@ private fun TitleCard(
     // val localDensity = LocalDensity.current
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .height(availableHeight.coerceAtMost(174.dp))
-            .wrapContentWidth()
             // .widthIn(min = 300.dp)
     ) {
         println(" Screen density: ${LocalDensity.current.density}")
@@ -180,29 +200,51 @@ private fun TitleCard(
 }
 
 @Composable
-private fun ScoreCard(modifier: Modifier = Modifier, name: String, value: Int) {
+private fun ScoreCard(
+    modifier: Modifier = Modifier,
+    name: String,
+    value: Int,
+    height: Dp) {
+
+    val fontScalingFactor = height.value / scoreCardHeight.value
+    println("Font scaling factor = $fontScalingFactor")
+
     Column (
         modifier = modifier
-            .height(scoreCardHeight)
+            .height(height)
             .background(MaterialTheme.colorScheme.surface)
-            .padding(vertical = 15.dp, horizontal = 30.dp),
-        verticalArrangement = Arrangement.Bottom
+            .padding(horizontal = 30.dp * fontScalingFactor),
+        verticalArrangement = Arrangement.Center
     ) {
-        val defaultTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 55.sp)
-        var textStyle by remember { mutableStateOf(defaultTextStyle) }
+        val defaultValueTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 55.sp * fontScalingFactor)
+        var valueTextStyle by remember { mutableStateOf(defaultValueTextStyle) }
+
+        val defaultNameTextStyle = MaterialTheme.typography.titleMedium.copy(fontSize = 27.sp * fontScalingFactor)
+        var nameTextStyle by remember { mutableStateOf(defaultNameTextStyle) }
+
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
             text =  value.toString(),
-            style = textStyle,
+            style = valueTextStyle,
             softWrap = false,
             onTextLayout = { textLayoutResult ->
                 if (textLayoutResult.didOverflowWidth) {
-                    textStyle = textStyle.copy(fontSize = textStyle.fontSize * 0.9)
+                    valueTextStyle = valueTextStyle.copy(fontSize = valueTextStyle.fontSize * 0.9)
                 }
             }
         )
-        Text(name, style = MaterialTheme.typography.titleSmall.copy(fontSize = 27.sp), color = MaterialTheme.colorScheme.primary)
+        Text(
+            text = name,
+            style = MaterialTheme.typography.titleSmall.copy(fontSize = 27.sp * fontScalingFactor),
+            color = MaterialTheme.colorScheme.primary,
+            softWrap = false,
+            onTextLayout = { textLayoutResult ->
+                if (textLayoutResult.didOverflowWidth) {
+                    nameTextStyle = nameTextStyle.copy(fontSize = nameTextStyle.fontSize * 0.9)
+                }
+            }
+        )
     }
 }
 
