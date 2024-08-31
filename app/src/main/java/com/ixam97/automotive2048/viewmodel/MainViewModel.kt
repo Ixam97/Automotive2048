@@ -17,6 +17,7 @@ import com.ixam97.automotive2048.ui.fadeInAnimationDuration
 import com.ixam97.automotive2048.ui.swipeAnimationDuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.max
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private val TAG = "MainViewModel"
@@ -91,19 +92,18 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 blockSwiping = true
 
                 tileMovements = gameStateUpdate.tileMovements
-                val newGameState = gameStateUpdate.gameState
-
                 gameGridState.applyMovements(tileMovements)
 
                 gameStateHistory.add(gameState)
-                if(gameStateHistory.size > 5) {
-                    gameStateHistory.removeAt(0)
-                }
+                if (gameStateHistory.size > 5) { gameStateHistory.removeAt(0) }
 
-                gameState = newGameState
-                if (gameState.score > highscore) {
-                    highscore = gameState.score
-                }
+                gameState = gameStateUpdate.gameState
+                gameGridState.updateValues(gameState)
+                gameGridState.addNewTile(gameState.addRandomTile())
+                tileMovements = TileMovements.noopMovements(gameState.dimensions)
+
+                if (gameState.score > highscore) { highscore = gameState.score }
+
                 gameRepository.saveGame(
                     gameState = gameState,
                     highscore =  highscore,
@@ -111,21 +111,18 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                     gameHistory = gameStateHistory
                 )
 
-                if (gameState.checkWinCondition() && !gameWinDismissed) {
-                    Log.e("GAME CONDITION", "GAME WON!")
-                    gameWon = true
-                } else if (gameState.checkLostCondition()) {
-                    Log.e("GAME CONDITION", "GAME LOST!")
-                    gameLost = true
-                }
-                gameGridState.updateValues(gameState)
-                gameGridState.addNewTile(gameState.addRandomTile())
-                tileMovements = TileMovements.noopMovements(gameState.dimensions)
-
                 viewModelScope.launch {
-                    delay(swipeAnimationDuration + fadeInAnimationDelay + fadeInAnimationDuration + 20L)
+                    delay(max(swipeAnimationDuration, fadeInAnimationDelay + fadeInAnimationDuration) + 50L)
                     gameGridState = GameGridState(gameState)
                     blockSwiping = false
+
+                    if (gameState.checkWinCondition() && !gameWinDismissed) {
+                        Log.e("GAME CONDITION", "GAME WON!")
+                        gameWon = true
+                    } else if (gameState.checkLostCondition()) {
+                        Log.e("GAME CONDITION", "GAME LOST!")
+                        gameLost = true
+                    }
                 }
             } else {
                 Log.i("GAME CONDITION", "INVALID MOVE")
