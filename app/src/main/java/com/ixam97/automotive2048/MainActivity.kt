@@ -40,21 +40,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-/*
-private fun generateTestRows(num: Int, size: Int, maxPower: Int = 5) : List<List<Int>> {
-    val rowsList = mutableListOf<List<Int>>()
-
-    for (i in 0 until num) {
-        val row = mutableListOf<Int>()
-        for (j in 0 until size) {
-            val power = (0..maxPower).random()
-            var value = 2f.pow(power).toInt()
-            if (value == 1) value = 0
-            row.add(value)
-        }
-        rowsList.add(row)
-    }
-    return rowsList
-}
-*/

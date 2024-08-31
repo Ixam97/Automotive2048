@@ -1,19 +1,14 @@
 package com.ixam97.automotive2048.domain
 
-import android.util.Log
-
-data class GameStateUpdate(
-    val gameState: GameState,
-    val tileMovements: TileMovements,
-    val validMove: Boolean
-)
-
-
+/**
+ * The current state of a running Game. Contains the dimensions of the Game Grid, the Cell
+ * occupation and values and the score. Member functions are used to calculate Game interaction
+ * based on the current state of the game.
+ */
 data class GameState(
     val dimensions: Int,
     val gameStateHolder: Array<IntArray> = Array(dimensions) { IntArray(dimensions) {0} },
-    val score: Int = 0,
-    var isEmpty: Boolean = true
+    val score: Int = 0
 ) {
 
     companion object {
@@ -29,6 +24,11 @@ data class GameState(
             val score: Int
         )
 
+        /**
+         * This calculates new Row values, assuming a left swipe as input. rowMovements contains Int
+         * values of how many Cells a Tile is moved to the left. Inputs and results have to be
+         * transformed according to the swipe direction.
+         */
         private fun calculateRowMovements(row: List<Int>): RowCalcResult {
             // Always assume a left swipe for this. Row is transformed beforehand.
             var scoreChange = 0
@@ -77,9 +77,14 @@ data class GameState(
                 mutableRow.add(0)
             }
 
-            return RowCalcResult(mutableRow.toList(), movementsArray, scoreChange)
+            return RowCalcResult(
+                row = mutableRow.toList(),
+                rowMovements =  movementsArray,
+                score = scoreChange
+            )
         }
 
+        /** Rotates a Game Grid by 90° to calculate vertical Row Movements. */
         private fun rotateSquareIntArray(originalSquareIntArray: Array<IntArray>): Array<IntArray> {
             val newGameStateHolder = Array(originalSquareIntArray.size) { IntArray(originalSquareIntArray.size) {0} }
             originalSquareIntArray.forEachIndexed { rowIndex, row ->
@@ -90,6 +95,7 @@ data class GameState(
             return newGameStateHolder
         }
 
+        /** Calculates a new Game Grind state für an Up-Swipe. Game Grid gets Rotated for this. */
         private fun calcSwipeUp(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
             val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder)
@@ -108,6 +114,7 @@ data class GameState(
             )
         }
 
+        /** Calculates a new Game Grind state für an Down-Swipe. Game Grid gets Rotated and reversed for this. */
         private fun calcSwipeDown(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
             val tmpGameStateHolder = rotateSquareIntArray(gameStateHolder)
@@ -126,6 +133,7 @@ data class GameState(
             )
         }
 
+        /** Calculates a new Game Grind state für an Left-Swipe. No transformations needed. */
         private fun  calcSwipeLeft(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
             val tmpNewGameState = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
@@ -143,6 +151,7 @@ data class GameState(
             )
         }
 
+        /** Calculates a new Game Grind state für an Left-Swipe. Game Grid gets reversed for this. */
         private fun calcSwipeRight(gameStateHolder: Array<IntArray>): GridCalcResult {
             var score = 0
             val tmpNewGameState = Array(gameStateHolder.size) { IntArray(gameStateHolder.size) {0} }
@@ -160,6 +169,7 @@ data class GameState(
             )
         }
 
+        /** Inline function to add a new Tile value. Returns a Tile to be added to GameGridTiles. */
         private fun Array<IntArray>.addTile(): Tile {
             val row = this.indices.random()
             val col = this.indices.random()
@@ -174,6 +184,16 @@ data class GameState(
                 )
             }
         }
+
+        /** Init a new Game with two starting tiles. */
+        fun initNewGame(dimensions: Int): GameState {
+            val initArray = Array(dimensions) { IntArray(dimensions) {0} }
+
+            initArray.addTile()
+            initArray.addTile()
+
+            return GameState(dimensions = dimensions, score = 0, gameStateHolder = initArray)
+        }
     }
 
     fun getTileValue(row: Int, column: Int): Int? {
@@ -186,10 +206,11 @@ data class GameState(
         return gameStateHolder.addTile()
     }
 
+    /**
+     * Calculate the result of a move in the Game. The result contains the new GameState after the
+     * move, the movements Tiles have to make during the move, and whether the move was valid.
+     */
     fun makeMove(direction: SwipeDirection): GameStateUpdate {
-        var scoreChange = 0
-        val tileMovements: TileMovements
-
         // perform the actual move
         val gridCalcResult =  when (direction) {
             SwipeDirection.UP -> calcSwipeUp(gameStateHolder)
@@ -199,14 +220,8 @@ data class GameState(
             SwipeDirection.NOOP -> GridCalcResult(gameStateHolder, TileMovements.noopMovements(gameStateHolder.size), 0)
         }
 
-        Log.d("MOVEMENTS", "Direction: ${gridCalcResult.tileMovements.dir.name}")
-        gridCalcResult.tileMovements.movements.forEachIndexed { index, row ->
-            Log.d("MOVEMENTS", "Row ${index}: ${row.toList()}")
-        }
-
-        scoreChange += gridCalcResult.score
-        tileMovements = gridCalcResult.tileMovements
-
+        val scoreChange = gridCalcResult.score
+        val tileMovements = gridCalcResult.tileMovements
         val newGameStateHolder = gridCalcResult.gameStateHolder
 
         if (!newGameStateHolder.contentDeepEquals(gameStateHolder)) {
@@ -219,6 +234,10 @@ data class GameState(
         return GameStateUpdate(this, tileMovements, false)
     }
 
+    /**
+     * Check for the conditions to lose a Game. Calculates all possible next moves. The Game is lost
+     * if all moves are invalid.
+     */
     fun checkLostCondition(): Boolean {
         // check if the game was lost
         val nextUp = calcSwipeUp(gameStateHolder).gameStateHolder.contentDeepEquals(gameStateHolder)
@@ -229,6 +248,7 @@ data class GameState(
         return (nextUp && nextRight && nextLeft && nextDown)
     }
 
+    /** Check for a Cell with the value of 2048 to check for a win. */
     fun checkWinCondition(): Boolean {
         gameStateHolder.forEach { row ->
             row.forEach { value ->
@@ -238,15 +258,6 @@ data class GameState(
             }
         }
         return false
-    }
-
-    fun initNewGame(dimensions: Int): GameState {
-        val initArray = Array(dimensions) { IntArray(dimensions) {0} }
-
-        initArray.addTile()
-        initArray.addTile()
-
-        return this.copy(score = 0, isEmpty = false, gameStateHolder = initArray)
     }
 
     inline fun forEachTile(action: (tile: Tile) -> Unit) {

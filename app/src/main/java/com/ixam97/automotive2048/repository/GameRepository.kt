@@ -27,7 +27,7 @@ class GameRepository(context: Context) {
 
     fun getSavedGameState(): GameState {
         val gson = Gson()
-        val gameStateString = sharedPrefs.getString(KEY_GAME_STATE, gson.toJson(GameState(4).initNewGame(4)))
+        val gameStateString = sharedPrefs.getString(KEY_GAME_STATE, gson.toJson(GameState.initNewGame(4)))
         return gson.fromJson(gameStateString, GameState::class.java)
     }
 

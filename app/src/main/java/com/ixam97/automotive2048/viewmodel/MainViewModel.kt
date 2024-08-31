@@ -11,7 +11,8 @@ import androidx.lifecycle.viewModelScope
 import com.ixam97.automotive2048.domain.SwipeDirection
 import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.repository.GameRepository
-import com.ixam97.automotive2048.domain.GameGridState
+import com.ixam97.automotive2048.domain.GameGridTiles
+import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.ui.fadeInAnimationDelay
 import com.ixam97.automotive2048.ui.fadeInAnimationDuration
 import com.ixam97.automotive2048.ui.swipeAnimationDuration
@@ -51,7 +52,14 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var tileMovements by mutableStateOf(TileMovements.noopMovements(gameState.dimensions))
         private set
 
-    var gameGridState by mutableStateOf(GameGridState(gameState))
+    var gameGridTiles by mutableStateOf(GameGridTiles(gameState))
+
+    init {
+        viewModelScope.launch {
+            delay(100)
+            blockSwiping = false
+        }
+    }
 
     fun historySize() = gameStateHistory.size
 
@@ -75,14 +83,6 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         showHowToPlayDialog = true
     }
 
-    init {
-        viewModelScope.launch {
-            delay(100)
-            gameGridState.enableAnimations()
-            blockSwiping = false
-        }
-    }
-
     fun swiped(dir: SwipeDirection) {
         if (blockSwiping) return
         Log.i(TAG, "Swiped: ${dir.name}")
@@ -92,14 +92,14 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 blockSwiping = true
 
                 tileMovements = gameStateUpdate.tileMovements
-                gameGridState.applyMovements(tileMovements)
+                gameGridTiles.applyMovements(tileMovements)
 
                 gameStateHistory.add(gameState)
                 if (gameStateHistory.size > 5) { gameStateHistory.removeAt(0) }
 
                 gameState = gameStateUpdate.gameState
-                gameGridState.updateValues(gameState)
-                gameGridState.addNewTile(gameState.addRandomTile())
+                gameGridTiles.updateValues(gameState)
+                gameGridTiles.addNewTile(gameState.addRandomTile())
                 tileMovements = TileMovements.noopMovements(gameState.dimensions)
 
                 if (gameState.score > highscore) { highscore = gameState.score }
@@ -113,7 +113,12 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
                 viewModelScope.launch {
                     delay(max(swipeAnimationDuration, fadeInAnimationDelay + fadeInAnimationDuration) + 50L)
-                    gameGridState = GameGridState(gameState)
+
+                    /**
+                     * Deleting single tiles from the GameGridState would cause wierd animations in
+                     * the compose UI. Therefore gameGridState is initialized again after each move.
+                     */
+                    gameGridTiles = GameGridTiles(gameState)
                     blockSwiping = false
 
                     if (gameState.checkWinCondition() && !gameWinDismissed) {
@@ -148,20 +153,19 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         saveSettings()
     }
 
-    fun restartGame() {
+    fun restartGame(dimensions: Int = 4) {
         Log.i(TAG, "Game restart requested")
         blockSwiping = true
         viewModelScope.launch {
-            gameState = gameState.initNewGame(4)
+            gameState = GameState.initNewGame(dimensions)
             gameStateHistory.clear()
             gameLost = false
             gameWon = false
             gameWinDismissed = false
-            gameGridState = GameGridState(gameState)
+            gameGridTiles = GameGridTiles(gameState)
             gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
 
             delay(100)
-            gameGridState.enableAnimations()
             blockSwiping = false
         }
     }
@@ -171,7 +175,7 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         viewModelScope.launch {
             if (gameStateHistory.size > 0) {
                 gameState = gameStateHistory.last()
-                gameGridState = GameGridState(gameState)
+                gameGridTiles = GameGridTiles(gameState)
                 gameStateHistory.removeAt(gameStateHistory.lastIndex)
                 gameLost = false
             }
@@ -181,7 +185,6 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                 winDismissed = gameWinDismissed
             )
             delay(100)
-            gameGridState.enableAnimations()
             blockSwiping = false
         }
     }
