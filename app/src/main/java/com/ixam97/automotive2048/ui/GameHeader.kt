@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtMost
@@ -112,8 +111,6 @@ fun GameHeader(
                 scoreCardHeight * (scoreAreaWidth.value / 600f)
             }
 
-            println("Adjusted Score Card Height: $adjustedScoreCardHeight (${adjustedScoreCardHeight.value}")
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -179,7 +176,6 @@ private fun TitleCard(
             .height(availableHeight.coerceAtMost(174.dp))
             // .widthIn(min = 300.dp)
     ) {
-        println(" Screen density: ${LocalDensity.current.density}")
         Column {
             Text(
                 text = "2048",
@@ -207,7 +203,6 @@ private fun ScoreCard(
     height: Dp) {
 
     val fontScalingFactor = height.value / scoreCardHeight.value
-    println("Font scaling factor = $fontScalingFactor")
 
     Column (
         modifier = modifier

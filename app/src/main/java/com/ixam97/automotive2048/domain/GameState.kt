@@ -5,7 +5,6 @@ import android.util.Log
 data class GameStateUpdate(
     val gameState: GameState,
     val tileMovements: TileMovements,
-    val newTile: Tile?,
     val validMove: Boolean
 )
 
@@ -183,6 +182,10 @@ data class GameState(
         else null
     }
 
+    fun addRandomTile(): Tile {
+        return gameStateHolder.addTile()
+    }
+
     fun makeMove(direction: SwipeDirection): GameStateUpdate {
         var scoreChange = 0
         val tileMovements: TileMovements
@@ -207,11 +210,13 @@ data class GameState(
         val newGameStateHolder = gridCalcResult.gameStateHolder
 
         if (!newGameStateHolder.contentDeepEquals(gameStateHolder)) {
-            val newTile = newGameStateHolder.addTile()
-            return GameStateUpdate(this.copy(gameStateHolder = newGameStateHolder, score = this.score + scoreChange), tileMovements, newTile, true)
+            return GameStateUpdate(
+                gameState = this.copy(gameStateHolder = newGameStateHolder, score = this.score + scoreChange),
+                tileMovements = tileMovements,
+                validMove = true
+            )
         }
-        return GameStateUpdate(this, tileMovements, null, false)
-        // return GameStateUpdate(GameState(dimensions, newGameState, score + scoreChange, isEmpty), tileMovements)
+        return GameStateUpdate(this, tileMovements, false)
     }
 
     fun checkLostCondition(): Boolean {
@@ -220,8 +225,6 @@ data class GameState(
         val nextDown = calcSwipeDown(gameStateHolder).gameStateHolder.contentDeepEquals(gameStateHolder)
         val nextLeft = calcSwipeLeft(gameStateHolder).gameStateHolder.contentDeepEquals(gameStateHolder)
         val nextRight = calcSwipeRight(gameStateHolder).gameStateHolder.contentDeepEquals(gameStateHolder)
-
-        Log.i("STATE", "$nextUp && $nextDown && $nextLeft && $nextRight")
 
         return (nextUp && nextRight && nextLeft && nextDown)
     }

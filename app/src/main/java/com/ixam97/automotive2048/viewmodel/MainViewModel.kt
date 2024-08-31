@@ -17,7 +17,6 @@ import com.ixam97.automotive2048.ui.fadeInAnimationDuration
 import com.ixam97.automotive2048.ui.swipeAnimationDuration
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.max
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     private val TAG = "MainViewModel"
@@ -119,13 +118,13 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
                     Log.e("GAME CONDITION", "GAME LOST!")
                     gameLost = true
                 }
-                gameGridState.updateGameState(gameState, gameStateUpdate.newTile)
+                gameGridState.updateValues(gameState)
+                gameGridState.addNewTile(gameState.addRandomTile())
                 tileMovements = TileMovements.noopMovements(gameState.dimensions)
 
-                // use a coroutine to delay game logic during animation
                 viewModelScope.launch {
-                    delay(max(swipeAnimationDuration, fadeInAnimationDelay + fadeInAnimationDuration).toLong() + 100)
-                    gameGridState = GameGridState(gameState) // this ensures the tile list is not growing indefinitely
+                    delay(swipeAnimationDuration + fadeInAnimationDelay + fadeInAnimationDuration + 20L)
+                    gameGridState = GameGridState(gameState)
                     blockSwiping = false
                 }
             } else {

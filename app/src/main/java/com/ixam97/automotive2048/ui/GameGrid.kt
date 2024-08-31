@@ -134,8 +134,6 @@ private fun GridTilesNew(
             .fillMaxSize()
     ){
         val boxSize = (maxWidth - 20.dp * (dimensions -1)) / dimensions
-        println("Tile list size: ${gameGridState.tiles.size}")
-        println("Tiles: ${gameGridState.tiles.toList()}")
 
         gameGridState.tiles.forEach { tile ->
             // if (!tile.consumed) {

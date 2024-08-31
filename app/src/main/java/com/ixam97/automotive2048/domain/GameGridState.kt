@@ -2,7 +2,9 @@ package com.ixam97.automotive2048.domain
 
 class GameGridState(private var gameState: GameState) {
 
-    val tiles = arrayListOf<Tile>()
+    var counter: Long = 0L
+
+    val tiles = mutableListOf<Tile>()
 
     var animate = false
         private set
@@ -11,24 +13,28 @@ class GameGridState(private var gameState: GameState) {
         initGameState(gameState)
     }
 
-    fun updateGameState(newGameState: GameState, newTile: Tile?) {
+    fun updateValues(newGameState: GameState) {
+        counter++
         animate = true
         tiles.forEach { tile ->
             tile.value = newGameState.getTileValue(tile.cell.row, tile.cell.col)?: 0
         }
+    }
 
-        newTile?.let {
-            tiles.add(it.copy(visible = false))
-        }
+    fun addNewTile(tile: Tile) {
+        counter++
+        tiles.add(tile.copy(visible = false))
     }
 
     fun applyMovements(tileMovements: TileMovements) {
+        counter++
         tiles.forEach {
             it.applyTileMovements(tileMovements)
         }
     }
 
     private fun initGameState(newGameState: GameState) {
+        counter++
         animate = false
         tiles.clear()
         newGameState.forEachTile { tile ->
@@ -41,6 +47,7 @@ class GameGridState(private var gameState: GameState) {
     }
 
     fun enableAnimations() {
+        counter++
         animate = true
     }
 /*
