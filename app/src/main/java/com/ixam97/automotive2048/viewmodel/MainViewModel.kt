@@ -1,6 +1,5 @@
 package com.ixam97.automotive2048.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -9,7 +8,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ixam97.automotive2048.domain.SwipeDirection
-import com.ixam97.automotive2048.domain.TileMovements
 import com.ixam97.automotive2048.repository.GameRepository
 import com.ixam97.automotive2048.domain.GameGridTiles
 import com.ixam97.automotive2048.domain.GameState
@@ -21,11 +19,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.max
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
-    private val TAG = "MainViewModel"
 
     private val gameStateHistory = gameRepository.getGameHistory().toMutableStateList()
 
-    private var blockSwiping = true
+    /** While the Tiles are moving or new Tiles are added, no swiping interaction should be possible. */
+    private var blockSwiping = false
 
     var highscore by mutableIntStateOf(gameRepository.getHighScore())
         private set
@@ -48,18 +46,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var showHowToPlayDialog by mutableStateOf(gameRepository.getFirstLaunch())
         private set
-
-    var tileMovements by mutableStateOf(TileMovements.noopMovements(gameState.dimensions))
-        private set
-
     var gameGridTiles by mutableStateOf(GameGridTiles(gameState))
-
-    init {
-        viewModelScope.launch {
-            delay(100)
-            blockSwiping = false
-        }
-    }
+        private set
 
     fun historySize() = gameStateHistory.size
 
@@ -85,62 +73,46 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     fun swiped(dir: SwipeDirection) {
         if (blockSwiping) return
-        Log.i(TAG, "Swiped: ${dir.name}")
 
         gameState.makeMove(dir).let { gameStateUpdate ->
             if (gameStateUpdate.validMove) {
                 blockSwiping = true
 
-                tileMovements = gameStateUpdate.tileMovements
-                gameGridTiles.applyMovements(tileMovements)
-
+                /** Add current GameState to Undo-History and delete entries > 5. */
                 gameStateHistory.add(gameState)
                 if (gameStateHistory.size > 5) { gameStateHistory.removeAt(0) }
 
                 gameState = gameStateUpdate.gameState
-                gameGridTiles.updateValues(gameState)
-                gameGridTiles.addNewTile(gameState.addRandomTile())
-                tileMovements = TileMovements.noopMovements(gameState.dimensions)
-
                 if (gameState.score > highscore) { highscore = gameState.score }
 
-                gameRepository.saveGame(
-                    gameState = gameState,
-                    highscore =  highscore,
-                    winDismissed = gameWinDismissed,
-                    gameHistory = gameStateHistory
-                )
+                /** Save the new Game State. */
+                gameRepository.saveGame(gameState, gameStateHistory, gameWinDismissed, highscore)
 
+                gameGridTiles.let {
+                    it.applyMovements(gameStateUpdate.tileMovements)
+                    it.updateValues(gameState)
+                    it.addNewTile(gameState.addRandomTile())
+                }
+
+                /**
+                 * Deleting single tiles from the GameGridState would cause wierd animations in
+                 * the compose UI. Therefore gameGridTiles is initialized again after each move.
+                 */
                 viewModelScope.launch {
-                    delay(max(swipeAnimationDuration, fadeInAnimationDelay + fadeInAnimationDuration) + 50L)
+                    delay(max(swipeAnimationDuration, (fadeInAnimationDelay + fadeInAnimationDuration)) + 50L)
 
-                    /**
-                     * Deleting single tiles from the GameGridState would cause wierd animations in
-                     * the compose UI. Therefore gameGridState is initialized again after each move.
-                     */
                     gameGridTiles = GameGridTiles(gameState)
                     blockSwiping = false
 
-                    if (gameState.checkWinCondition() && !gameWinDismissed) {
-                        Log.e("GAME CONDITION", "GAME WON!")
-                        gameWon = true
-                    } else if (gameState.checkLostCondition()) {
-                        Log.e("GAME CONDITION", "GAME LOST!")
-                        gameLost = true
-                    }
+                    if (gameState.checkWinCondition() && !gameWinDismissed) { gameWon = true }
+                    else if (gameState.checkLostCondition()) { gameLost = true }
                 }
-            } else {
-                Log.i("GAME CONDITION", "INVALID MOVE")
             }
-
         }
     }
 
     private fun saveSettings() {
-        gameRepository.saveSettings(
-            allowUndo = undoButtonEnabled,
-            oemSchemeEnabled = oemSchemeEnabled
-        )
+        gameRepository.saveSettings(undoButtonEnabled, oemSchemeEnabled)
     }
 
     fun toggleUndoButtonSetting() {
@@ -154,39 +126,23 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     }
 
     fun restartGame(dimensions: Int = 4) {
-        Log.i(TAG, "Game restart requested")
-        blockSwiping = true
-        viewModelScope.launch {
-            gameState = GameState.initNewGame(dimensions)
-            gameStateHistory.clear()
-            gameLost = false
-            gameWon = false
-            gameWinDismissed = false
-            gameGridTiles = GameGridTiles(gameState)
-            gameRepository.saveGame(gameState = gameState, gameHistory = gameStateHistory, winDismissed = gameWinDismissed)
-
-            delay(100)
-            blockSwiping = false
-        }
+        gameState = GameState.initNewGame(dimensions)
+        gameStateHistory.clear()
+        gameLost = false
+        gameWon = false
+        gameWinDismissed = false
+        gameGridTiles = GameGridTiles(gameState)
+        gameRepository.saveGame(gameState, gameStateHistory, gameWinDismissed)
     }
 
     fun undoMove() {
-        blockSwiping = true
-        viewModelScope.launch {
-            if (gameStateHistory.size > 0) {
-                gameState = gameStateHistory.last()
-                gameGridTiles = GameGridTiles(gameState)
-                gameStateHistory.removeAt(gameStateHistory.lastIndex)
-                gameLost = false
-            }
-            gameRepository.saveGame(
-                gameState = gameState,
-                gameHistory = gameStateHistory,
-                winDismissed = gameWinDismissed
-            )
-            delay(100)
-            blockSwiping = false
+        if (gameStateHistory.size > 0) {
+            gameState = gameStateHistory.last()
+            gameGridTiles = GameGridTiles(gameState)
+            gameStateHistory.removeAt(gameStateHistory.lastIndex)
+            gameLost = false
         }
+        gameRepository.saveGame(gameState, gameStateHistory, gameWinDismissed)
     }
 
     fun dismissWin() {

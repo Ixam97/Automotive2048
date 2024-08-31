@@ -260,10 +260,10 @@ data class GameState(
         return false
     }
 
-    inline fun forEachTile(action: (tile: Tile) -> Unit) {
+    inline fun forEachCell(action: (cell: Cell, value: Int) -> Unit) {
         gameStateHolder.forEachIndexed { rowIndex, row ->
             row.forEachIndexed { columnIndex, value ->
-                action(Tile(cell = Cell(rowIndex, columnIndex), value = value))
+                action(Cell(rowIndex, columnIndex), value)
             }
         }
     }

@@ -11,9 +11,9 @@ class GameGridTiles(gameState: GameState) {
 
     init {
         tiles.clear()
-        gameState.forEachTile { tile ->
-            if (tile.value != 0) {
-                tiles.add(tile)
+        gameState.forEachCell { cell, value ->
+            if (value != 0) {
+                tiles.add(Tile(cell, value))
             }
         }
     }
