@@ -15,9 +15,12 @@
     <uses-feature
         android:name="android.hardware.screen.landscape"
         android:required="false"/>
+
+    <!--
     <uses-feature
         android:name="android.hardware.gamepad"
         android:required="false"/>
+    -->
 
     <application
         android:icon="@mipmap/ic_launcher"
