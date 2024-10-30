@@ -46,6 +46,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
         private set
     var showHowToPlayDialog by mutableStateOf(gameRepository.getFirstLaunch())
         private set
+    var link by mutableIntStateOf(0)
+        private set
     var gameGridTiles by mutableStateOf(GameGridTiles(gameState))
         private set
 
@@ -66,6 +68,14 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     fun closeHowToPlayDialog() {
         gameRepository.setFirstLaunch(false)
         showHowToPlayDialog = false
+    }
+    fun openLinkViewer(id: Int) {
+        when (id) {
+            1, 2 -> link = id
+        }
+    }
+    fun closeLinkViewer() {
+        link = 0
     }
     fun openHowToPlayDialog() {
         showHowToPlayDialog = true

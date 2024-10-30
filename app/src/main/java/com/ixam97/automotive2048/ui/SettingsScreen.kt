@@ -1,7 +1,8 @@
 package com.ixam97.automotive2048.ui
 
-import android.content.Intent
-import android.net.Uri
+// import android.content.Intent
+// import android.net.Uri
+// import androidx.compose.ui.platform.LocalContext
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ixam97.automotive2048.R
@@ -36,6 +36,7 @@ import com.ixam97.automotive2048.viewmodel.MainViewModel
 import com.ixam97.automotive2048.BuildConfig
 import com.ixam97.automotive2048.repository.GameRepository
 import com.ixam97.automotive2048.ui.components.SwitchRow
+import com.ixam97.automotive2048.ui.theme.LinkViewer
 
 @Composable
 fun SettingsScreen(viewModel: MainViewModel) {
@@ -95,7 +96,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                val context = LocalContext.current
+                // val context = LocalContext.current
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
@@ -142,12 +143,13 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     external = true,
                     browsable = true,
                     onClick = {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(context.getString(R.string.github_url))
-                            )
-                        )
+                        // context.startActivity(
+                        //     Intent(
+                        //         Intent.ACTION_VIEW,
+                        //         Uri.parse(context.getString(R.string.github_url))
+                        //     )
+                        // )
+                        viewModel.openLinkViewer(1)
                     }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
@@ -157,12 +159,13 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     external = true,
                     browsable = true,
                     onClick = {
-                        context.startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(context.getString(R.string.inspired_url))
-                            )
-                        )
+                        // context.startActivity(
+                        //     Intent(
+                        //         Intent.ACTION_VIEW,
+                        //         Uri.parse(context.getString(R.string.inspired_url))
+                        //     )
+                        // )
+                        viewModel.openLinkViewer(2)
                     }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
@@ -183,6 +186,25 @@ fun SettingsScreen(viewModel: MainViewModel) {
             ) {
                 Text(stringResource(R.string.dialog_how_to_text))
             }
+        }
+
+        if (viewModel.link != 0) {
+            when (viewModel.link) {
+                1  -> {
+                    LinkViewer(
+                        url = R.string.github_url,
+                        qr = R.drawable.qr_github
+                    ) { viewModel.closeLinkViewer() }
+                }
+                2  -> {
+                    LinkViewer(
+                        url = R.string.inspired_url,
+                        qr = R.drawable.qr_inspired
+                    ) { viewModel.closeLinkViewer() }
+                }
+                else -> viewModel.closeLinkViewer()
+            }
+
         }
     }
 }
