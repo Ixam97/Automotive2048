@@ -14,7 +14,7 @@ android {
         minSdk = 29
         targetSdk = 34
         versionCode = 16
-        versionName = "2.0.10"
+        versionName = "2.0.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,6 +29,18 @@ android {
             )
         }
     }
+    flavorDimensions += "linktype"
+
+    productFlavors {
+        create("qr") {
+            dimension = "linktype"
+            versionNameSuffix = "-qr"
+        }
+        create("link") {
+            dimension = "linktype"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

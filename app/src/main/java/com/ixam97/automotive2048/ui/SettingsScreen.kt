@@ -1,8 +1,8 @@
 package com.ixam97.automotive2048.ui
 
-// import android.content.Intent
-// import android.net.Uri
-// import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,7 +96,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // val context = LocalContext.current
+                val context = LocalContext.current
                 Text(
                     modifier = Modifier
                         .padding(horizontal = 24.dp)
@@ -127,9 +127,19 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     text = stringResource(R.string.about_title)
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
+
+                val versionNameString = if (viewModel.sysInfoString.isBlank()) {
+                    BuildConfig.VERSION_NAME
+                } else {
+                    "${BuildConfig.VERSION_NAME}\n${viewModel.sysInfoString}"
+                }
+
                 MenuRow(
                     title = stringResource(R.string.version_headline),
-                    text = BuildConfig.VERSION_NAME
+                    text = versionNameString,
+                    onClick = {
+                        viewModel.versionClick(context)
+                    }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
                 MenuRow(
@@ -143,13 +153,16 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     external = true,
                     browsable = true,
                     onClick = {
-                        // context.startActivity(
-                        //     Intent(
-                        //         Intent.ACTION_VIEW,
-                        //         Uri.parse(context.getString(R.string.github_url))
-                        //     )
-                        // )
-                        viewModel.openLinkViewer(1)
+                        if (BuildConfig.FLAVOR == "link") {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(context.getString(R.string.github_url))
+                                )
+                            )
+                        } else {
+                            viewModel.openLinkViewer(1)
+                        }
                     }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
@@ -159,13 +172,16 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     external = true,
                     browsable = true,
                     onClick = {
-                        // context.startActivity(
-                        //     Intent(
-                        //         Intent.ACTION_VIEW,
-                        //         Uri.parse(context.getString(R.string.inspired_url))
-                        //     )
-                        // )
-                        viewModel.openLinkViewer(2)
+                        if (BuildConfig.FLAVOR == "link") {
+                            context.startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(context.getString(R.string.inspired_url))
+                                )
+                            )
+                        } else {
+                            viewModel.openLinkViewer(2)
+                        }
                     }
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))

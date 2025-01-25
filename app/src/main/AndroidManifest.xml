@@ -32,6 +32,7 @@
         tools:targetApi="34">
         <activity
             android:name=".MainActivity"
+            android:label="@string/app_name_short"
             android:exported="true"
             android:theme="@style/Theme.Automotive2048">
             <intent-filter>

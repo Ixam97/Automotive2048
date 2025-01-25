@@ -1,5 +1,7 @@
 package com.ixam97.automotive2048.viewmodel
 
+import android.app.ActivityManager
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -14,8 +16,11 @@ import com.ixam97.automotive2048.domain.GameState
 import com.ixam97.automotive2048.ui.fadeInAnimationDelay
 import com.ixam97.automotive2048.ui.fadeInAnimationDuration
 import com.ixam97.automotive2048.ui.swipeAnimationDuration
+import com.ixam97.automotive2048.utils.fetchCpuName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
@@ -24,6 +29,8 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
 
     /** While the Tiles are moving or new Tiles are added, no swiping interaction should be possible. */
     private var blockSwiping = false
+
+    private var versionClickCounter = 0
 
     var highscore by mutableIntStateOf(gameRepository.getHighScore())
         private set
@@ -51,6 +58,9 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     var gameGridTiles by mutableStateOf(GameGridTiles(gameState))
         private set
 
+    var sysInfoString by mutableStateOf("")
+        private set
+
     fun historySize() = gameStateHistory.size
 
     fun settingsClicked() {
@@ -72,6 +82,21 @@ class MainViewModel(private val gameRepository: GameRepository) : ViewModel() {
     fun openLinkViewer(id: Int) {
         when (id) {
             1, 2 -> link = id
+        }
+    }
+    fun versionClick(context: Context) {
+        if (versionClickCounter < 7) {
+            versionClickCounter++
+        } else {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO) {
+                    val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                    val memInfo = ActivityManager.MemoryInfo()
+                    activityManager.getMemoryInfo(memInfo)
+
+                    sysInfoString = "\nCPU-Info: ${fetchCpuName()}\nRAM-Info:\n      total: ${memInfo.totalMem / 1_000_000} MB\n      available: ${memInfo.availMem / 1_000_000} MB"
+                }
+            }
         }
     }
     fun closeLinkViewer() {
