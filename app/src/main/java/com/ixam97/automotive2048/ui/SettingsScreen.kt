@@ -144,7 +144,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
                 MenuRow(
                     title = stringResource(R.string.copyright_headline),
-                    text = "©2024 Maximilian Goldschmidt"
+                    text = "©2026 Maximilian Goldschmidt"
                 )
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 25.dp))
                 MenuRow(
