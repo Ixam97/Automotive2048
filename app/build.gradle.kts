@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.ixam97.automotive2048"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ixam97.automotive2048"
         minSdk = 29
-        targetSdk = 34
-        versionCode = 18
-        versionName = "2.0.12"
+        targetSdk = 36
+        versionCode = 20
+        versionName = "2.0.14"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

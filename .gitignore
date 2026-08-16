@@ -9,6 +9,7 @@
 /.idea/assetWizardSettings.xml
 /.idea/emulatorDisplays.xml
 /.idea/deploymentTargetSelector.xml
+/.idea
 .DS_Store
 /build
 /release
